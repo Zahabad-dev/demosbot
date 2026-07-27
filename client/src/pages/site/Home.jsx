@@ -28,8 +28,10 @@ export default function Home() {
   return (
     <div className="page">
       <header className="hero">
-        <span className="badge">🌮 Centro de Tulancingo, Hidalgo</span>
+        <span className="crown">👑</span>
+        <span className="badge">📍 Centro de Tulancingo, Hidalgo</span>
         <h1>Tacos Memo</h1>
+        <p className="tagline">EL REY DEL TROMPO</p>
         <p>Tacos de verdad, atendidos por WhatsApp — pregúntale a nuestro asistente por menú, precios y horarios.</p>
         <a className="cta" href={`https://wa.me/${whatsapp}`} target="_blank" rel="noreferrer">
           Escríbenos por WhatsApp
