@@ -1,0 +1,81 @@
+.admin {
+  min-height: 100vh;
+  background: #14181f;
+  color: #e8e8ec;
+  font-family: system-ui, sans-serif;
+}
+
+.admin-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #14181f;
+}
+
+.admin-login form {
+  background: #1e232c;
+  padding: 2.5rem;
+  border-radius: 1rem;
+  width: 100%;
+  max-width: 22rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.admin-login h1 { color: #fff; margin: 0 0 0.5rem; font-size: 1.4rem; }
+
+.admin input, .admin textarea, .admin select {
+  background: #262c37;
+  border: 1px solid #3a4150;
+  color: #fff;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  width: 100%;
+}
+
+.admin textarea { min-height: 8rem; font-family: inherit; resize: vertical; }
+
+.admin button {
+  background: #F5C518;
+  color: #14181f;
+  border: none;
+  padding: 0.7rem 1.2rem;
+  border-radius: 0.5rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin button.secondary { background: transparent; color: #F5C518; border: 1px solid #F5C518; }
+.admin button.danger { background: #C1272D; color: #fff; }
+
+.admin-shell { display: flex; min-height: 100vh; }
+.admin-nav {
+  width: 220px;
+  background: #1e232c;
+  padding: 1.5rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.admin-nav a { color: #c8ccd6; text-decoration: none; padding: 0.5rem 0.75rem; border-radius: 0.4rem; }
+.admin-nav a.active, .admin-nav a:hover { background: #2c3340; color: #fff; }
+.admin-content { flex: 1; padding: 2rem 2.5rem; max-width: 60rem; }
+
+.admin-content h1 { margin-top: 0; }
+.field { margin-bottom: 1.1rem; display: flex; flex-direction: column; gap: 0.3rem; }
+.field label { font-size: 0.85rem; color: #9aa1ad; }
+
+.faq-row {
+  background: #1e232c;
+  border-radius: 0.7rem;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.faq-row-actions { display: flex; gap: 0.5rem; justify-content: flex-end; }
+.error-msg { color: #ff8080; font-size: 0.9rem; }
