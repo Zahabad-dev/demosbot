@@ -56,3 +56,10 @@ INSERT INTO admin_users (negocio_id, username, password_hash, nombre, rol)
 SELECT n.id, 'admin@tacosmemo.com', '__HASH_BCRYPT__', 'Admin Tacos Memo', 'cliente'
 FROM negocios n WHERE n.slug = 'tacos-memo'
 ON CONFLICT (username) DO NOTHING;
+
+-- Acceso adicional para demos de la agencia (mismo privilegio 'cliente', mismo negocio).
+-- ⚠️ Igual que arriba: __HASH_BCRYPT__ es placeholder, genera el hash real antes de correr.
+INSERT INTO admin_users (negocio_id, username, password_hash, nombre, rol)
+SELECT n.id, 'demo@blackzpr.com', '__HASH_BCRYPT__', 'Demo Black Sheep', 'cliente'
+FROM negocios n WHERE n.slug = 'tacos-memo'
+ON CONFLICT (username) DO NOTHING;
