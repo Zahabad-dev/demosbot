@@ -3,7 +3,10 @@
 -- Para moldear a otro giro (ej. venta de azulejos), duplica este bloque cambiando
 -- nombre/giro/system_prompt/FAQ — no se toca ni el esquema ni el flujo de n8n.
 
-INSERT INTO negocios (slug, nombre, giro, ciudad, tono, system_prompt, whatsapp_numero, activo)
+-- ⚠️ chatwoot_inbox_id debe coincidir con el "inbox_id" real que manda Chatwoot en el webhook
+-- (Settings → Inboxes → el inbox conectado). Sin este dato correcto, el flujo de n8n no
+-- encuentra el negocio y el nodo "Obtener Negocio (por inbox)" no devuelve filas.
+INSERT INTO negocios (slug, nombre, giro, ciudad, tono, system_prompt, whatsapp_numero, chatwoot_inbox_id, activo)
 VALUES (
   'tacos-memo',
   'Tacos Memo',
@@ -18,6 +21,7 @@ VALUES (
   || 'dile que un encargado de la taquería le va a escribir en un momento y marca la conversación para escalar. '
   || 'Sé breve: máximo 3-4 líneas por respuesta, como un mensaje real de WhatsApp.',
   '',
+  '1',
   true
 )
 ON CONFLICT (slug) DO NOTHING;
