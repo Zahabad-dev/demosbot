@@ -108,6 +108,22 @@
   margin-bottom: 0.5rem;
 }
 
+.badge-baneado {
+  display: inline-block;
+  background: rgba(255, 128, 128, 0.15);
+  color: #ff8080;
+  border: 1px solid #ff8080;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.ban-row { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
+.ban-row input { flex: 1 1 12rem; }
+
 .badge-activo {
   display: inline-block;
   background: rgba(143, 209, 143, 0.15);

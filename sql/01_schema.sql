@@ -53,9 +53,10 @@ CREATE TABLE IF NOT EXISTS solicitudes (
   chatwoot_conversation_id VARCHAR(50),
   ultimo_mensaje    TEXT,
   historial         JSONB DEFAULT '[]',                -- acumula intercambios cliente/bot
-  estado            VARCHAR(30) DEFAULT 'Nuevo',        -- Nuevo | Escalado | Atendido | Cerrado
+  estado            VARCHAR(30) DEFAULT 'Nuevo',        -- Nuevo | Escalado | Atendido | Cerrado | Baneado
   prioridad         VARCHAR(20) DEFAULT 'BAJA',
   bot_bloqueado     BOOLEAN DEFAULT false,
+  motivo_baneo      TEXT,                                -- comentario del admin al banear (ej. pedido falso a domicilio)
   leido             BOOLEAN DEFAULT false,
   intencion_compra  BOOLEAN DEFAULT false,
   creado_en         TIMESTAMPTZ DEFAULT NOW(),

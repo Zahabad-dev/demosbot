@@ -157,15 +157,16 @@ adminRouter.get('/negocios/:negocioId/solicitudes', requireAuth, scopeNegocio, a
 });
 
 adminRouter.put('/solicitudes/:id', requireAuth, async (req, res) => {
-  const { estado, prioridad, bot_bloqueado, leido } = req.body;
+  const { estado, prioridad, bot_bloqueado, leido, motivo_baneo } = req.body;
   const { rows } = await query(
     `UPDATE solicitudes SET
        estado = COALESCE($2, estado),
        prioridad = COALESCE($3, prioridad),
        bot_bloqueado = COALESCE($4, bot_bloqueado),
-       leido = COALESCE($5, leido)
+       leido = COALESCE($5, leido),
+       motivo_baneo = COALESCE($6, motivo_baneo)
      WHERE id = $1 RETURNING *`,
-    [req.params.id, estado, prioridad, bot_bloqueado, leido]
+    [req.params.id, estado, prioridad, bot_bloqueado, leido, motivo_baneo]
   );
   res.json(rows[0]);
 });

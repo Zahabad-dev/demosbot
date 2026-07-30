@@ -43,6 +43,8 @@ export default function MenuInteractivo() {
   const [error, setError] = useState(false);
   const [tabActiva, setTabActiva] = useState(SECCIONES[0].key);
   const [itemAbierto, setItemAbierto] = useState(null);
+  const [seleccionados, setSeleccionados] = useState([]);
+  const [resumenAbierto, setResumenAbierto] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -61,8 +63,18 @@ export default function MenuInteractivo() {
     return propios.length > 0 ? propios : MENU_DEMO[clave];
   };
 
+  const estaSeleccionado = (item) => seleccionados.some((s) => s.pregunta === item.pregunta);
+
+  const toggleSeleccion = (item) => {
+    setSeleccionados((prev) =>
+      prev.some((s) => s.pregunta === item.pregunta)
+        ? prev.filter((s) => s.pregunta !== item.pregunta)
+        : [...prev, item]
+    );
+  };
+
   const whatsapp = negocio?.whatsapp_numero || WHATSAPP_FALLBACK;
-  const whatsappUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent('Hola, quiero ver el menú')}`;
+  const whatsappUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent('Hola, quiero pedir a domicilio')}`;
 
   return (
     <div className="rb-page">
@@ -70,6 +82,7 @@ export default function MenuInteractivo() {
         {negocio?.logo_data_url && <img src={negocio.logo_data_url} alt="" className="rb-logo" />}
         <h1>{negocio?.nombre || 'Menú'}</h1>
         <p className="rb-tagline">MENÚ INTERACTIVO</p>
+        <p className="rb-sub">Selecciona lo que quieras y arma tu pedido para pedirlo en tu mesa.</p>
         {error && <p className="rb-hint">(Demo sin conexión a la base de datos — así se verá con datos reales.)</p>}
       </header>
 
@@ -88,7 +101,7 @@ export default function MenuInteractivo() {
       <section className="rb-section">
         <div className="rb-grid">
           {porCategoria(tabActiva).map((item, i) => (
-            <button className="rb-card rb-card-clickable" key={i} onClick={() => setItemAbierto(item)}>
+            <div className={`rb-card ${estaSeleccionado(item) ? 'rb-card-seleccionada' : ''}`} key={i}>
               {item.imagen_url ? (
                 <img src={item.imagen_url} alt={item.pregunta} className="rb-card-img" />
               ) : (
@@ -96,15 +109,32 @@ export default function MenuInteractivo() {
               )}
               <h3>{item.pregunta}</h3>
               <p>{item.respuesta}</p>
-              <span className="rb-card-expand">Ver más ⤢</span>
-            </button>
+              <div className="rb-card-actions">
+                <button className="rb-card-link" onClick={() => setItemAbierto(item)}>Ver más ⤢</button>
+                <button
+                  className={`rb-select-btn ${estaSeleccionado(item) ? 'rb-select-btn-activo' : ''}`}
+                  onClick={() => toggleSeleccion(item)}
+                >
+                  {estaSeleccionado(item) ? '✓ Agregado' : '+ Agregar'}
+                </button>
+              </div>
+            </div>
           ))}
         </div>
       </section>
 
-      <a className="rb-cta rb-cta-fixed" href={whatsappUrl} target="_blank" rel="noreferrer">
-        Pedir por WhatsApp
-      </a>
+      <div className="rb-orden-bar">
+        <button
+          className="rb-cta rb-cta-fixed"
+          onClick={() => setResumenAbierto(true)}
+          disabled={seleccionados.length === 0}
+        >
+          Pedido listo{seleccionados.length > 0 && ` (${seleccionados.length})`}
+        </button>
+        <a className="rb-link-domicilio" href={whatsappUrl} target="_blank" rel="noreferrer">
+          ¿Vas a pedir a domicilio? Escríbenos por WhatsApp
+        </a>
+      </div>
 
       {itemAbierto && (
         <div className="rb-modal-overlay" onClick={() => setItemAbierto(null)}>
@@ -117,6 +147,27 @@ export default function MenuInteractivo() {
             )}
             <h2>{itemAbierto.pregunta}</h2>
             <p>{itemAbierto.respuesta}</p>
+          </div>
+        </div>
+      )}
+
+      {resumenAbierto && (
+        <div className="rb-modal-overlay" onClick={() => setResumenAbierto(false)}>
+          <div className="rb-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="rb-modal-close" onClick={() => setResumenAbierto(false)}>✕</button>
+            <h2>Tu pedido</h2>
+            <ul className="rb-resumen-lista">
+              {seleccionados.map((it, i) => (
+                <li key={i}>
+                  <strong>{it.pregunta}</strong>
+                  <span>{it.respuesta}</span>
+                </li>
+              ))}
+            </ul>
+            <p className="rb-resumen-aviso">
+              👋 Indícale esto a tu mesero para ordenar — este resumen es solo para ti, no se envía
+              automáticamente a nadie.
+            </p>
           </div>
         </div>
       )}
