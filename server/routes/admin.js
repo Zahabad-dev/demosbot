@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { query } from '../db.js';
+import { query, withTransaction } from '../db.js';
 import { login, requireAuth, scopeNegocio } from '../auth.js';
 import { config } from '../config.js';
 
@@ -63,13 +63,30 @@ adminRouter.put('/negocios/:negocioId', requireAuth, scopeNegocio, async (req, r
   res.json(rows[0]);
 });
 
+// Activar un negocio como "la demo en vivo" — desactiva todos los demás en la misma
+// transacción, así el flujo de n8n (que filtra por activo = true) nunca lee dos
+// negocios a la vez ni se cruza con datos de otra demo. Los datos de los negocios
+// desactivados no se tocan: solo cambia la bandera activo.
+adminRouter.put('/negocios/:negocioId/activar', requireAuth, async (req, res) => {
+  if (req.auth.rol !== 'agencia') return res.status(403).json({ error: 'Solo la agencia puede cambiar el negocio activo' });
+  const negocio = await withTransaction(async (client) => {
+    await client.query('UPDATE negocios SET activo = false WHERE id <> $1', [req.params.negocioId]);
+    const { rows } = await client.query('UPDATE negocios SET activo = true WHERE id = $1 RETURNING *', [req.params.negocioId]);
+    return rows[0];
+  });
+  if (!negocio) return res.status(404).json({ error: 'No encontrado' });
+  res.json(negocio);
+});
+
 // Solo rol 'agencia' puede crear negocios nuevos (nuevos clientes/demos).
+// Nace SIEMPRE inactivo (activo = false): así nunca compite por el chatwoot_inbox_id
+// con la demo que esté activa en ese momento. Se activa a propósito con /activar.
 adminRouter.post('/negocios', requireAuth, async (req, res) => {
   if (req.auth.rol !== 'agencia') return res.status(403).json({ error: 'Solo la agencia puede crear negocios' });
   const { slug, nombre, giro, ciudad, tono, system_prompt } = req.body;
   const { rows } = await query(
-    `INSERT INTO negocios (slug, nombre, giro, ciudad, tono, system_prompt)
-     VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
+    `INSERT INTO negocios (slug, nombre, giro, ciudad, tono, system_prompt, activo)
+     VALUES ($1,$2,$3,$4,$5,$6,false) RETURNING *`,
     [slug, nombre, giro, ciudad, tono || 'amigable', system_prompt]
   );
   res.status(201).json(rows[0]);

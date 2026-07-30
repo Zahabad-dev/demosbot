@@ -95,6 +95,19 @@
   gap: 0.5rem;
 }
 .faq-row-actions { display: flex; gap: 0.5rem; justify-content: flex-end; flex-wrap: wrap; }
+
+.badge-activo {
+  display: inline-block;
+  background: rgba(143, 209, 143, 0.15);
+  color: #8fd18f;
+  border: 1px solid #8fd18f;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
 .error-msg { color: #ff8080; font-size: 0.9rem; }
 
 @media (max-width: 768px) {
