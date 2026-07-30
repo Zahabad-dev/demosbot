@@ -141,8 +141,129 @@
 
 .rb-powered { opacity: 0.6; font-size: 0.8rem; margin-top: 0.25rem; }
 
+/* --- Menú interactivo (/menu/:slug) --- */
+
+.rb-hero-compact { padding: 2rem 1.5rem 1.5rem; }
+
+.rb-tabs {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 1rem 1.25rem;
+  background: var(--rb-wood);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.rb-tab {
+  flex: 0 0 auto;
+  background: transparent;
+  border: 1px solid var(--rb-gold);
+  color: var(--rb-gold);
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.rb-tab-activa { background: var(--rb-gold); color: var(--rb-dark); }
+
+.rb-card-clickable {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  width: 100%;
+  font-family: inherit;
+  cursor: pointer;
+  position: relative;
+}
+
+.rb-card-img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 0.6rem;
+  margin-bottom: 0.75rem;
+  background: #e8ddc8;
+}
+
+.rb-card-img-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+}
+
+.rb-card-expand {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--rb-gold);
+  font-weight: 700;
+}
+
+.rb-cta-fixed {
+  position: sticky;
+  bottom: 1rem;
+  align-self: center;
+  margin: 0 auto 1.5rem;
+  display: block;
+  width: fit-content;
+}
+
+.rb-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 50;
+}
+
+.rb-modal {
+  background: var(--rb-cream);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  max-width: 26rem;
+  width: 100%;
+  position: relative;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+
+.rb-modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: var(--rb-dark);
+  color: var(--rb-cream);
+  border: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.rb-modal-img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 0.7rem;
+  margin-bottom: 1rem;
+}
+
+.rb-modal h2 { margin: 0 0 0.5rem; color: var(--rb-dark); }
+.rb-modal p { margin: 0; color: #5a4a3c; line-height: 1.5; }
+
 @media (max-width: 480px) {
   .rb-hero { padding: 2.5rem 1.25rem; }
   .rb-section { padding: 2.25rem 1.25rem; }
   .rb-cta { width: 100%; text-align: center; }
+  .rb-cta-fixed { width: calc(100% - 2.5rem); }
 }

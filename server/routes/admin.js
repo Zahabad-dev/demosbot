@@ -101,26 +101,27 @@ adminRouter.get('/negocios/:negocioId/faq', requireAuth, scopeNegocio, async (re
 });
 
 adminRouter.post('/negocios/:negocioId/faq', requireAuth, scopeNegocio, async (req, res) => {
-  const { categoria, pregunta, respuesta, orden } = req.body;
+  const { categoria, pregunta, respuesta, orden, imagen_url } = req.body;
   const { rows } = await query(
-    `INSERT INTO faq (negocio_id, categoria, pregunta, respuesta, orden)
-     VALUES ($1,$2,$3,$4,$5) RETURNING *`,
-    [req.params.negocioId, categoria || 'general', pregunta, respuesta, orden || 0]
+    `INSERT INTO faq (negocio_id, categoria, pregunta, respuesta, orden, imagen_url)
+     VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
+    [req.params.negocioId, categoria || 'general', pregunta, respuesta, orden || 0, imagen_url || null]
   );
   res.status(201).json(rows[0]);
 });
 
 adminRouter.put('/faq/:id', requireAuth, async (req, res) => {
-  const { categoria, pregunta, respuesta, activo, orden } = req.body;
+  const { categoria, pregunta, respuesta, activo, orden, imagen_url } = req.body;
   const { rows } = await query(
     `UPDATE faq SET
        categoria = COALESCE($2, categoria),
        pregunta = COALESCE($3, pregunta),
        respuesta = COALESCE($4, respuesta),
        activo = COALESCE($5, activo),
-       orden = COALESCE($6, orden)
+       orden = COALESCE($6, orden),
+       imagen_url = COALESCE($7, imagen_url)
      WHERE id = $1 RETURNING *`,
-    [req.params.id, categoria, pregunta, respuesta, activo, orden]
+    [req.params.id, categoria, pregunta, respuesta, activo, orden, imagen_url]
   );
   res.json(rows[0]);
 });

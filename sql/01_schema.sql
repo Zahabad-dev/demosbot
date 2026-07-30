@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS faq (
   categoria      VARCHAR(80) DEFAULT 'general',
   pregunta       TEXT NOT NULL,
   respuesta      TEXT NOT NULL,
+  imagen_url     TEXT,                                 -- link externo opcional (ej. Unsplash), no se guarda la imagen en la BD
   activo         BOOLEAN DEFAULT true,
   orden          INTEGER DEFAULT 0,
   creado_en      TIMESTAMPTZ DEFAULT NOW(),

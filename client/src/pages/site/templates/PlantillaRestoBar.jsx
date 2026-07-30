@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import '../../../styles/resto-bar.css';
 
-const WHATSAPP_FALLBACK = '7770000000';
+const WHATSAPP_FALLBACK = '5217751667681'; // numero de demo del usuario para probar el QR
 
 // Menu de ejemplo — se usa solo si el negocio todavia no tiene FAQ propia cargada
 // (categorias: entradas, fuertes, bebidas, postres). En cuanto haya filas reales
@@ -89,6 +89,7 @@ export default function PlantillaRestoBar({ negocio, faq, error }) {
           <div className="rb-grid">
             {porCategoria(seccion.key).map((item, i) => (
               <div className="rb-card" key={i}>
+                {item.imagen_url && <img src={item.imagen_url} alt={item.pregunta} className="rb-card-img" />}
                 <h3>{item.pregunta}</h3>
                 <p>{item.respuesta}</p>
               </div>

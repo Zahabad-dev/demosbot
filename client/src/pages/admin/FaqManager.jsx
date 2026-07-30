@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../../lib/apiClient';
 
-const empty = { categoria: 'general', pregunta: '', respuesta: '', orden: 0 };
+const empty = { categoria: 'general', pregunta: '', respuesta: '', orden: 0, imagen_url: '' };
 
 export default function FaqManager() {
   const { negocioId } = useParams();
@@ -53,6 +53,11 @@ export default function FaqManager() {
           <input value={item.categoria} onChange={(e) => onChange(item.id, 'categoria', e.target.value)} placeholder="categoría" />
           <input value={item.pregunta} onChange={(e) => onChange(item.id, 'pregunta', e.target.value)} placeholder="pregunta" />
           <textarea value={item.respuesta} onChange={(e) => onChange(item.id, 'respuesta', e.target.value)} rows={3} />
+          <input
+            value={item.imagen_url || ''}
+            onChange={(e) => onChange(item.id, 'imagen_url', e.target.value)}
+            placeholder="URL de imagen (opcional, ej. para ítems de menú)"
+          />
           <label style={{ fontSize: '0.85rem', color: '#9aa1ad' }}>
             <input
               type="checkbox"
@@ -74,6 +79,11 @@ export default function FaqManager() {
         <input value={nuevo.categoria} onChange={(e) => setNuevo({ ...nuevo, categoria: e.target.value })} placeholder="categoría" />
         <input value={nuevo.pregunta} onChange={(e) => setNuevo({ ...nuevo, pregunta: e.target.value })} placeholder="pregunta" required />
         <textarea value={nuevo.respuesta} onChange={(e) => setNuevo({ ...nuevo, respuesta: e.target.value })} placeholder="respuesta" rows={3} required />
+        <input
+          value={nuevo.imagen_url}
+          onChange={(e) => setNuevo({ ...nuevo, imagen_url: e.target.value })}
+          placeholder="URL de imagen (opcional, ej. para ítems de menú)"
+        />
         {error && <p className="error-msg">{error}</p>}
         <button type="submit">Agregar</button>
       </form>

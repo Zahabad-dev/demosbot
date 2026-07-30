@@ -3,10 +3,12 @@ import { query } from '../db.js';
 
 export const publicRouter = Router();
 
-// Datos del negocio para pintar el sitio público (Tacos Memo, o el que sea).
+// Datos del negocio por slug fijo — usado por links permanentes (ej. el menu interactivo
+// que se pega en el FAQ). A propósito NO filtra por `activo`: ese link debe seguir
+// funcionando aunque el negocio deje de ser el activo del switch.
 publicRouter.get('/negocio/:slug', async (req, res) => {
   const { rows } = await query(
-    'SELECT slug, nombre, giro, ciudad, tono, whatsapp_numero, plantilla, logo_data_url FROM negocios WHERE slug = $1 AND activo = true',
+    'SELECT slug, nombre, giro, ciudad, tono, whatsapp_numero, plantilla, logo_data_url FROM negocios WHERE slug = $1',
     [req.params.slug]
   );
   if (!rows[0]) return res.status(404).json({ error: 'Negocio no encontrado' });
@@ -25,7 +27,7 @@ publicRouter.get('/negocio-activo', async (req, res) => {
 
 publicRouter.get('/negocio-activo/faq', async (req, res) => {
   const { rows } = await query(
-    `SELECT f.categoria, f.pregunta, f.respuesta
+    `SELECT f.categoria, f.pregunta, f.respuesta, f.imagen_url
      FROM faq f JOIN negocios n ON n.id = f.negocio_id
      WHERE n.activo = true AND f.activo = true
      ORDER BY f.orden ASC, f.id ASC`
@@ -33,9 +35,11 @@ publicRouter.get('/negocio-activo/faq', async (req, res) => {
   res.json(rows);
 });
 
+// Igual que /negocio/:slug: sin filtro de `activo` para que el link del menu permanente
+// nunca se rompa aunque este negocio deje de ser el activo del switch.
 publicRouter.get('/negocio/:slug/faq', async (req, res) => {
   const { rows } = await query(
-    `SELECT f.categoria, f.pregunta, f.respuesta
+    `SELECT f.categoria, f.pregunta, f.respuesta, f.imagen_url
      FROM faq f JOIN negocios n ON n.id = f.negocio_id
      WHERE n.slug = $1 AND f.activo = true
      ORDER BY f.orden ASC, f.id ASC`,

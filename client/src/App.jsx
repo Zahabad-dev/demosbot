@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Home from './pages/site/Home';
+import MenuInteractivo from './pages/site/MenuInteractivo';
 import Login from './pages/admin/Login';
 import AdminLayout from './pages/admin/AdminLayout';
 import NegociosList from './pages/admin/NegociosList';
@@ -23,6 +24,7 @@ export default function App() {
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/menu/:slug" element={<MenuInteractivo />} />
           <Route path="/admin/login" element={<Login />} />
           <Route
             path="/admin"
