@@ -2,8 +2,61 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../../lib/apiClient';
 
+const ESTADOS_PEDIDO = ['Nuevo', 'En proceso', 'Completado'];
+
+function PedidosModal({ solicitudId, onClose }) {
+  const [pedidos, setPedidos] = useState([]);
+  const [cargando, setCargando] = useState(true);
+
+  const load = () =>
+    api.get(`/admin/solicitudes/${solicitudId}/pedidos`)
+      .then(setPedidos)
+      .catch(() => setPedidos([]))
+      .finally(() => setCargando(false));
+
+  useEffect(() => { load(); }, [solicitudId]);
+
+  const cambiarEstado = async (pedido, estado) => {
+    await api.put(`/admin/pedidos/${pedido.id}`, { estado });
+    load();
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-box-close" onClick={onClose}>✕</button>
+        <h2>Historial de pedidos</h2>
+        {cargando && <p style={{ color: '#9aa1ad' }}>Cargando…</p>}
+        {!cargando && pedidos.length === 0 && (
+          <p style={{ color: '#9aa1ad' }}>Este contacto todavía no ha hecho un pedido desde el menú interactivo.</p>
+        )}
+        {pedidos.map((p) => (
+          <div className="faq-row" key={p.id}>
+            <strong>Pedido #{p.id} · {p.tipo_entrega === 'domicilio' ? 'A domicilio' : 'Pasar por él'}</strong>
+            <span style={{ color: '#9aa1ad' }}>{new Date(p.creado_en).toLocaleString('es-MX')}</span>
+            <ul style={{ margin: '0.5rem 0', paddingLeft: '1.1rem' }}>
+              {(Array.isArray(p.items) ? p.items : []).map((it, i) => (
+                <li key={i}>
+                  <strong>{it.nombre}</strong>{it.detalle ? ` — ${it.detalle}` : ''}
+                </li>
+              ))}
+            </ul>
+            <div className="field">
+              <label>Estatus del pedido</label>
+              <select value={p.estado} onChange={(e) => cambiarEstado(p, e.target.value)}>
+                {ESTADOS_PEDIDO.map((e) => <option key={e} value={e}>{e}</option>)}
+              </select>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function SolicitudRow({ item, onUpdated }) {
   const [motivo, setMotivo] = useState('');
+  const [pedidosAbierto, setPedidosAbierto] = useState(false);
   const estaBaneado = item.estado === 'Baneado';
 
   const toggleBot = async () => {
@@ -44,6 +97,10 @@ function SolicitudRow({ item, onUpdated }) {
         </button>
       </div>
 
+      <div className="faq-row-actions">
+        <button className="secondary" onClick={() => setPedidosAbierto(true)}>Historial de pedidos</button>
+      </div>
+
       {estaBaneado ? (
         <div className="faq-row-actions">
           <button className="danger" onClick={desbanear}>Quitar baneo</button>
@@ -57,6 +114,10 @@ function SolicitudRow({ item, onUpdated }) {
           />
           <button className="danger" onClick={banear}>Banear número</button>
         </div>
+      )}
+
+      {pedidosAbierto && (
+        <PedidosModal solicitudId={item.id} onClose={() => setPedidosAbierto(false)} />
       )}
     </div>
   );

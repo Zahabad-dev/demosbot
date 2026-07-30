@@ -170,3 +170,24 @@ adminRouter.put('/solicitudes/:id', requireAuth, async (req, res) => {
   );
   res.json(rows[0]);
 });
+
+// --- Pedidos (generados desde el menu interactivo, insertados por n8n) ---
+// Se relacionan por negocio_id + telefono de la solicitud, no por FK directa.
+adminRouter.get('/solicitudes/:solicitudId/pedidos', requireAuth, async (req, res) => {
+  const { rows: sol } = await query('SELECT negocio_id, telefono FROM solicitudes WHERE id = $1', [req.params.solicitudId]);
+  if (!sol[0]) return res.status(404).json({ error: 'Solicitud no encontrada' });
+  const { rows } = await query(
+    'SELECT * FROM pedidos WHERE negocio_id = $1 AND telefono = $2 ORDER BY creado_en DESC',
+    [sol[0].negocio_id, sol[0].telefono]
+  );
+  res.json(rows);
+});
+
+adminRouter.put('/pedidos/:id', requireAuth, async (req, res) => {
+  const { estado } = req.body;
+  const { rows } = await query(
+    'UPDATE pedidos SET estado = COALESCE($2, estado) WHERE id = $1 RETURNING *',
+    [req.params.id, estado]
+  );
+  res.json(rows[0]);
+});

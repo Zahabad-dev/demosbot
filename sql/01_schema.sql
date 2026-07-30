@@ -64,6 +64,22 @@ CREATE TABLE IF NOT EXISTS solicitudes (
   UNIQUE(negocio_id, telefono)
 );
 
+-- Pedidos generados desde el menu interactivo (seleccion de items + "pasar por el"/"a domicilio").
+-- El bot de n8n los inserta al detectar el marcador [PEDIDO_INTERACTIVO:...] en el mensaje de
+-- WhatsApp (ver nodo "Detectar Pedido Interactivo" del flujo). No depende de solicitudes.id
+-- directamente, se relaciona por negocio_id + telefono para no acoplar ambos flujos.
+CREATE TABLE IF NOT EXISTS pedidos (
+  id             SERIAL PRIMARY KEY,
+  negocio_id     INTEGER NOT NULL REFERENCES negocios(id) ON DELETE CASCADE,
+  telefono       VARCHAR(30) NOT NULL,
+  nombre_contacto VARCHAR(150),
+  tipo_entrega   VARCHAR(20) NOT NULL,                 -- 'pickup' | 'domicilio'
+  items          JSONB NOT NULL DEFAULT '[]',           -- [{ nombre, detalle }]
+  estado         VARCHAR(30) DEFAULT 'Nuevo',           -- Nuevo | En proceso | Completado
+  creado_en      TIMESTAMPTZ DEFAULT NOW(),
+  actualizado_en TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS admin_users (
   id             SERIAL PRIMARY KEY,
   negocio_id     INTEGER REFERENCES negocios(id) ON DELETE CASCADE, -- NULL = admin agencia (ve todos los negocios)
@@ -79,6 +95,8 @@ CREATE INDEX IF NOT EXISTS idx_faq_negocio ON faq(negocio_id);
 CREATE INDEX IF NOT EXISTS idx_links_negocio ON links(negocio_id);
 CREATE INDEX IF NOT EXISTS idx_solicitudes_negocio ON solicitudes(negocio_id);
 CREATE INDEX IF NOT EXISTS idx_solicitudes_telefono ON solicitudes(telefono);
+CREATE INDEX IF NOT EXISTS idx_pedidos_negocio ON pedidos(negocio_id);
+CREATE INDEX IF NOT EXISTS idx_pedidos_telefono ON pedidos(telefono);
 
 -- trigger genérico de actualizado_en
 CREATE OR REPLACE FUNCTION set_actualizado_en()
@@ -101,6 +119,10 @@ BEGIN
   END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_solicitudes_upd') THEN
     CREATE TRIGGER trg_solicitudes_upd BEFORE UPDATE ON solicitudes
+      FOR EACH ROW EXECUTE FUNCTION set_actualizado_en();
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_pedidos_upd') THEN
+    CREATE TRIGGER trg_pedidos_upd BEFORE UPDATE ON pedidos
       FOR EACH ROW EXECUTE FUNCTION set_actualizado_en();
   END IF;
 END $$;

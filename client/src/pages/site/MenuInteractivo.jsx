@@ -45,6 +45,7 @@ export default function MenuInteractivo() {
   const [itemAbierto, setItemAbierto] = useState(null);
   const [seleccionados, setSeleccionados] = useState([]);
   const [resumenAbierto, setResumenAbierto] = useState(false);
+  const [entregaAbierto, setEntregaAbierto] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -74,7 +75,21 @@ export default function MenuInteractivo() {
   };
 
   const whatsapp = negocio?.whatsapp_numero || WHATSAPP_FALLBACK;
-  const whatsappUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent('Hola, quiero pedir a domicilio')}`;
+
+  // Mensaje con marcador que el flujo de n8n detecta ("Detectar Pedido Interactivo") para
+  // registrar el pedido en la tabla `pedidos` — el texto despues del marcador son los items.
+  const pedirPorWhatsapp = (tipoEntrega) => {
+    const marcador = tipoEntrega === 'domicilio' ? 'DOMICILIO' : 'PASO_POR_EL';
+    let mensaje;
+    if (seleccionados.length > 0) {
+      const lineas = seleccionados.map((it) => `- ${it.pregunta}: ${it.respuesta}`).join('\n');
+      mensaje = `[PEDIDO_INTERACTIVO:${marcador}]\n${lineas}`;
+    } else {
+      mensaje = tipoEntrega === 'domicilio' ? 'Hola, quiero pedir a domicilio' : 'Hola, quiero pasar por mi pedido';
+    }
+    window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(mensaje)}`, '_blank', 'noreferrer');
+    setEntregaAbierto(false);
+  };
 
   return (
     <div className="rb-page">
@@ -131,9 +146,9 @@ export default function MenuInteractivo() {
         >
           Pedido listo{seleccionados.length > 0 && ` (${seleccionados.length})`}
         </button>
-        <a className="rb-link-domicilio" href={whatsappUrl} target="_blank" rel="noreferrer">
+        <button className="rb-link-domicilio" onClick={() => setEntregaAbierto(true)}>
           ¿Vas a pedir a domicilio? Escríbenos por WhatsApp
-        </a>
+        </button>
       </div>
 
       {itemAbierto && (
@@ -168,6 +183,25 @@ export default function MenuInteractivo() {
               👋 Indícale esto a tu mesero para ordenar — este resumen es solo para ti, no se envía
               automáticamente a nadie.
             </p>
+          </div>
+        </div>
+      )}
+
+      {entregaAbierto && (
+        <div className="rb-modal-overlay" onClick={() => setEntregaAbierto(false)}>
+          <div className="rb-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="rb-modal-close" onClick={() => setEntregaAbierto(false)}>✕</button>
+            <h2>¿Cómo quieres tu pedido?</h2>
+            <div className="rb-entrega-opciones">
+              <button className="rb-entrega-btn" onClick={() => pedirPorWhatsapp('pickup')}>
+                🚶 Paso por él
+                <span>Recoges tu pedido directo en el local</span>
+              </button>
+              <button className="rb-entrega-btn" onClick={() => pedirPorWhatsapp('domicilio')}>
+                🛵 A domicilio
+                <span>Te lo llevamos a tu dirección</span>
+              </button>
+            </div>
           </div>
         </div>
       )}
