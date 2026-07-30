@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../../lib/apiClient';
 
+const MAX_LOGO_BYTES = 2 * 1024 * 1024; // 2MB
+
 export default function NegocioEditor() {
   const { negocioId } = useParams();
   const [form, setForm] = useState(null);
@@ -13,6 +15,20 @@ export default function NegocioEditor() {
   }, [negocioId]);
 
   const set = (field) => (e) => setForm({ ...form, [field]: e.target.value });
+
+  const onLogoChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError('');
+    if (file.size > MAX_LOGO_BYTES) {
+      setError('El logo pesa mas de 2MB, sube uno mas ligero.');
+      e.target.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setForm((f) => ({ ...f, logo_data_url: reader.result }));
+    reader.readAsDataURL(file);
+  };
 
   const onSave = async (e) => {
     e.preventDefault();
@@ -73,6 +89,20 @@ export default function NegocioEditor() {
         <div className="field">
           <label>Chatwoot Account ID</label>
           <input value={form.chatwoot_account_id || ''} onChange={set('chatwoot_account_id')} />
+        </div>
+        <div className="field">
+          <label>Plantilla del sitio publico</label>
+          <select value={form.plantilla || 'generico'} onChange={set('plantilla')}>
+            <option value="generico">Generico (estilo Tacos Memo)</option>
+            <option value="resto-bar">Resto-bar</option>
+          </select>
+        </div>
+        <div className="field">
+          <label>Logo del negocio (cuadrado, min. 512x512px, PNG/SVG, max. 2MB)</label>
+          {form.logo_data_url && (
+            <img src={form.logo_data_url} alt="Logo actual" className="logo-preview" />
+          )}
+          <input type="file" accept="image/*" onChange={onLogoChange} />
         </div>
         {error && <p className="error-msg">{error}</p>}
         {saved && <p style={{ color: '#8fd18f' }}>Guardado.</p>}

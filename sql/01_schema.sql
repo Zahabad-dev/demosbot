@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS negocios (
   whatsapp_numero      VARCHAR(30),
   chatwoot_inbox_id    VARCHAR(50),                    -- inbox de Chatwoot conectado a este negocio
   chatwoot_account_id  VARCHAR(50),
+  plantilla      VARCHAR(50) NOT NULL DEFAULT 'generico', -- 'generico' | 'resto-bar' | ... (plantilla visual del sitio)
+  logo_data_url  TEXT,                                 -- logo del negocio como data URL base64 (editable desde el panel)
   activo         BOOLEAN DEFAULT true,
   creado_en      TIMESTAMPTZ DEFAULT NOW(),
   actualizado_en TIMESTAMPTZ DEFAULT NOW()

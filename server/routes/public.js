@@ -6,11 +6,31 @@ export const publicRouter = Router();
 // Datos del negocio para pintar el sitio público (Tacos Memo, o el que sea).
 publicRouter.get('/negocio/:slug', async (req, res) => {
   const { rows } = await query(
-    'SELECT slug, nombre, giro, ciudad, tono, whatsapp_numero FROM negocios WHERE slug = $1 AND activo = true',
+    'SELECT slug, nombre, giro, ciudad, tono, whatsapp_numero, plantilla, logo_data_url FROM negocios WHERE slug = $1 AND activo = true',
     [req.params.slug]
   );
   if (!rows[0]) return res.status(404).json({ error: 'Negocio no encontrado' });
   res.json(rows[0]);
+});
+
+// El sitio público sigue al negocio que este activo en ese momento (el switch del panel),
+// sin importar cual sea su slug — asi "segun el bot que se elija" es la pagina que se muestra.
+publicRouter.get('/negocio-activo', async (req, res) => {
+  const { rows } = await query(
+    'SELECT slug, nombre, giro, ciudad, tono, whatsapp_numero, plantilla, logo_data_url FROM negocios WHERE activo = true LIMIT 1'
+  );
+  if (!rows[0]) return res.status(404).json({ error: 'No hay negocio activo' });
+  res.json(rows[0]);
+});
+
+publicRouter.get('/negocio-activo/faq', async (req, res) => {
+  const { rows } = await query(
+    `SELECT f.categoria, f.pregunta, f.respuesta
+     FROM faq f JOIN negocios n ON n.id = f.negocio_id
+     WHERE n.activo = true AND f.activo = true
+     ORDER BY f.orden ASC, f.id ASC`
+  );
+  res.json(rows);
 });
 
 publicRouter.get('/negocio/:slug/faq', async (req, res) => {

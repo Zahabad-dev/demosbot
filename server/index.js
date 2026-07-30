@@ -11,7 +11,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const clientDist = path.join(__dirname, '..', 'client', 'dist');
 
 const app = express();
-app.use(express.json());
+app.use(express.json({ limit: '4mb' })); // el logo del negocio viaja como data URL base64
 app.use(cookieParser());
 app.use(cors({ origin: true, credentials: true }));
 

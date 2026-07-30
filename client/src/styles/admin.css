@@ -96,6 +96,18 @@
 }
 .faq-row-actions { display: flex; gap: 0.5rem; justify-content: flex-end; flex-wrap: wrap; }
 
+.logo-preview {
+  display: block;
+  width: 90px;
+  height: 90px;
+  object-fit: contain;
+  background: #262c37;
+  border: 1px solid #3a4150;
+  border-radius: 0.5rem;
+  padding: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
 .badge-activo {
   display: inline-block;
   background: rgba(143, 209, 143, 0.15);

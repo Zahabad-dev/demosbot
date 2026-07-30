@@ -45,7 +45,7 @@ adminRouter.get('/negocios/:negocioId', requireAuth, scopeNegocio, async (req, r
 });
 
 adminRouter.put('/negocios/:negocioId', requireAuth, scopeNegocio, async (req, res) => {
-  const { nombre, giro, ciudad, tono, system_prompt, whatsapp_numero, chatwoot_inbox_id, chatwoot_account_id, activo } = req.body;
+  const { nombre, giro, ciudad, tono, system_prompt, whatsapp_numero, chatwoot_inbox_id, chatwoot_account_id, activo, plantilla, logo_data_url } = req.body;
   const { rows } = await query(
     `UPDATE negocios SET
        nombre = COALESCE($2, nombre),
@@ -56,9 +56,11 @@ adminRouter.put('/negocios/:negocioId', requireAuth, scopeNegocio, async (req, r
        whatsapp_numero = COALESCE($7, whatsapp_numero),
        chatwoot_inbox_id = COALESCE($8, chatwoot_inbox_id),
        chatwoot_account_id = COALESCE($9, chatwoot_account_id),
-       activo = COALESCE($10, activo)
+       activo = COALESCE($10, activo),
+       plantilla = COALESCE($11, plantilla),
+       logo_data_url = COALESCE($12, logo_data_url)
      WHERE id = $1 RETURNING *`,
-    [req.params.negocioId, nombre, giro, ciudad, tono, system_prompt, whatsapp_numero, chatwoot_inbox_id, chatwoot_account_id, activo]
+    [req.params.negocioId, nombre, giro, ciudad, tono, system_prompt, whatsapp_numero, chatwoot_inbox_id, chatwoot_account_id, activo, plantilla, logo_data_url]
   );
   res.json(rows[0]);
 });
