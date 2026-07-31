@@ -41,6 +41,7 @@ export default function PlantillaRestoBar({ negocio, faq, error }) {
   const whatsapp = negocio?.whatsapp_numero || WHATSAPP_FALLBACK;
   const mensajePrellenado = encodeURIComponent('Hola, quiero ver el menú');
   const whatsappUrl = `https://wa.me/${whatsapp}?text=${mensajePrellenado}`;
+  const whatsappReservaUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent('Hola, quiero reservar una mesa')}`;
 
   useEffect(() => {
     QRCode.toDataURL(whatsappUrl, { width: 320, margin: 1, color: { dark: '#1b1410', light: '#f2e9d8' } })
@@ -80,6 +81,9 @@ export default function PlantillaRestoBar({ negocio, faq, error }) {
         </div>
         <a className="rb-cta" href={whatsappUrl} target="_blank" rel="noreferrer">
           Pedir por WhatsApp
+        </a>
+        <a className="rb-cta rb-cta-outline" href={whatsappReservaUrl} target="_blank" rel="noreferrer">
+          Reservar mesa
         </a>
       </section>
 

@@ -98,6 +98,25 @@ CREATE TABLE IF NOT EXISTS citas (
   actualizado_en TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Reservaciones de mesa, hechas por conversacion natural de WhatsApp (no por una pagina
+-- interactiva como pedidos/citas). El agente de n8n extrae nombre/fecha/horario/personas
+-- de la platica y emite el marcador [RESERVA_MESA] al final de su respuesta; el nodo
+-- "Detectar Reserva de Mesa" lo parsea y lo inserta aqui. Solo aplica a negocios con
+-- tipo_funcion = 'pedidos' (restaurantes) — independiente de la plantilla visual, igual
+-- que pedidos/citas.
+CREATE TABLE IF NOT EXISTS reservas (
+  id             SERIAL PRIMARY KEY,
+  negocio_id     INTEGER NOT NULL REFERENCES negocios(id) ON DELETE CASCADE,
+  telefono       VARCHAR(30) NOT NULL,
+  nombre_cliente VARCHAR(150),
+  fecha          VARCHAR(50),                           -- texto libre para demo (ej. "Viernes")
+  horario        VARCHAR(50),                           -- texto libre para demo (ej. "8:00 pm")
+  personas       VARCHAR(10),
+  estado         VARCHAR(30) DEFAULT 'Nueva',            -- Nueva | Confirmada | Completada | Cancelada
+  creado_en      TIMESTAMPTZ DEFAULT NOW(),
+  actualizado_en TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS admin_users (
   id             SERIAL PRIMARY KEY,
   negocio_id     INTEGER REFERENCES negocios(id) ON DELETE CASCADE, -- NULL = admin agencia (ve todos los negocios)
@@ -117,6 +136,8 @@ CREATE INDEX IF NOT EXISTS idx_pedidos_negocio ON pedidos(negocio_id);
 CREATE INDEX IF NOT EXISTS idx_pedidos_telefono ON pedidos(telefono);
 CREATE INDEX IF NOT EXISTS idx_citas_negocio ON citas(negocio_id);
 CREATE INDEX IF NOT EXISTS idx_citas_telefono ON citas(telefono);
+CREATE INDEX IF NOT EXISTS idx_reservas_negocio ON reservas(negocio_id);
+CREATE INDEX IF NOT EXISTS idx_reservas_telefono ON reservas(telefono);
 
 -- trigger genérico de actualizado_en
 CREATE OR REPLACE FUNCTION set_actualizado_en()
@@ -147,6 +168,10 @@ BEGIN
   END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_citas_upd') THEN
     CREATE TRIGGER trg_citas_upd BEFORE UPDATE ON citas
+      FOR EACH ROW EXECUTE FUNCTION set_actualizado_en();
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_reservas_upd') THEN
+    CREATE TRIGGER trg_reservas_upd BEFORE UPDATE ON reservas
       FOR EACH ROW EXECUTE FUNCTION set_actualizado_en();
   END IF;
 END $$;

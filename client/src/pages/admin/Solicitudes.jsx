@@ -4,6 +4,7 @@ import { api } from '../../lib/apiClient';
 
 const ESTADOS_PEDIDO = ['Nuevo', 'En proceso', 'Completado'];
 const ESTADOS_CITA = ['Nueva', 'Confirmada', 'Completada', 'Cancelada'];
+const ESTADOS_RESERVA = ['Nueva', 'Confirmada', 'Completada', 'Cancelada'];
 
 function PedidosModal({ solicitudId, onClose }) {
   const [pedidos, setPedidos] = useState([]);
@@ -101,10 +102,57 @@ function CitasModal({ solicitudId, onClose }) {
   );
 }
 
+function ReservasModal({ solicitudId, onClose }) {
+  const [reservas, setReservas] = useState([]);
+  const [cargando, setCargando] = useState(true);
+
+  const load = () =>
+    api.get(`/admin/solicitudes/${solicitudId}/reservas`)
+      .then(setReservas)
+      .catch(() => setReservas([]))
+      .finally(() => setCargando(false));
+
+  useEffect(() => { load(); }, [solicitudId]);
+
+  const cambiarEstado = async (reserva, estado) => {
+    await api.put(`/admin/reservas/${reserva.id}`, { estado });
+    load();
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-box-close" onClick={onClose}>✕</button>
+        <h2>Historial de reservas</h2>
+        {cargando && <p style={{ color: '#9aa1ad' }}>Cargando…</p>}
+        {!cargando && reservas.length === 0 && (
+          <p style={{ color: '#9aa1ad' }}>Este contacto todavía no ha reservado mesa por WhatsApp.</p>
+        )}
+        {reservas.map((r) => (
+          <div className="faq-row" key={r.id}>
+            <strong>Reserva #{r.id} · {r.personas || '?'} personas</strong>
+            <span style={{ color: '#9aa1ad' }}>
+              {r.nombre_cliente || 'Sin nombre'} · {r.fecha || '—'} {r.horario || ''}
+            </span>
+            <span style={{ color: '#9aa1ad', fontSize: '0.8rem' }}>Solicitada: {new Date(r.creado_en).toLocaleString('es-MX')}</span>
+            <div className="field">
+              <label>Estatus de la reserva</label>
+              <select value={r.estado} onChange={(e) => cambiarEstado(r, e.target.value)}>
+                {ESTADOS_RESERVA.map((e) => <option key={e} value={e}>{e}</option>)}
+              </select>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function SolicitudRow({ item, onUpdated }) {
   const [motivo, setMotivo] = useState('');
   const [pedidosAbierto, setPedidosAbierto] = useState(false);
   const [citasAbierto, setCitasAbierto] = useState(false);
+  const [reservasAbierto, setReservasAbierto] = useState(false);
   const estaBaneado = item.estado === 'Baneado';
 
   const toggleBot = async () => {
@@ -148,6 +196,7 @@ function SolicitudRow({ item, onUpdated }) {
       <div className="faq-row-actions">
         <button className="secondary" onClick={() => setPedidosAbierto(true)}>Historial de pedidos</button>
         <button className="secondary" onClick={() => setCitasAbierto(true)}>Historial de citas</button>
+        <button className="secondary" onClick={() => setReservasAbierto(true)}>Historial de reservas</button>
       </div>
 
       {estaBaneado ? (
@@ -170,6 +219,9 @@ function SolicitudRow({ item, onUpdated }) {
       )}
       {citasAbierto && (
         <CitasModal solicitudId={item.id} onClose={() => setCitasAbierto(false)} />
+      )}
+      {reservasAbierto && (
+        <ReservasModal solicitudId={item.id} onClose={() => setReservasAbierto(false)} />
       )}
     </div>
   );

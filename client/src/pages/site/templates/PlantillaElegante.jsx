@@ -26,6 +26,7 @@ export default function PlantillaElegante({ negocio, faq, error }) {
   const whatsapp = negocio?.whatsapp_numero || WHATSAPP_FALLBACK;
   const mensajePrellenado = encodeURIComponent('Hola, quiero ver el menú');
   const whatsappUrl = `https://wa.me/${whatsapp}?text=${mensajePrellenado}`;
+  const whatsappReservaUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent('Hola, quiero reservar una mesa')}`;
   const slug = negocio?.slug || 'flora';
 
   useEffect(() => {
@@ -50,7 +51,7 @@ export default function PlantillaElegante({ negocio, faq, error }) {
         </div>
         <ul className="fl-nav-links">
           <li><a href={`/menu/${slug}`}>Menú</a></li>
-          <li><a href={whatsappUrl} target="_blank" rel="noreferrer">Reservas</a></li>
+          <li><a href={whatsappReservaUrl} target="_blank" rel="noreferrer">Reservas</a></li>
           <li><a href="#ubicacion">Ubicación</a></li>
           <li><a href={whatsappUrl} target="_blank" rel="noreferrer">Contacto</a></li>
         </ul>
@@ -95,7 +96,7 @@ export default function PlantillaElegante({ negocio, faq, error }) {
       <div className="fl-cards-row" id="ubicacion">
         <div className="fl-mini-card">
           <h3>Reservar mesa</h3>
-          <a href={whatsappUrl} target="_blank" rel="noreferrer">Escríbenos por WhatsApp</a>
+          <a href={whatsappReservaUrl} target="_blank" rel="noreferrer">Escríbenos por WhatsApp</a>
         </div>
         <div className="fl-mini-card">
           <h3>Ver menú</h3>

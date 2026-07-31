@@ -213,3 +213,25 @@ adminRouter.put('/citas/:id', requireAuth, async (req, res) => {
   );
   res.json(rows[0]);
 });
+
+// --- Reservas de mesa (guardadas por n8n al detectar el marcador [RESERVA_MESA] que el
+// agente emite en conversacion libre, solo para negocios con tipo_funcion = 'pedidos') ---
+// Mismo patron que pedidos/citas: relacion por negocio_id + telefono, no por FK directa.
+adminRouter.get('/solicitudes/:solicitudId/reservas', requireAuth, async (req, res) => {
+  const { rows: sol } = await query('SELECT negocio_id, telefono FROM solicitudes WHERE id = $1', [req.params.solicitudId]);
+  if (!sol[0]) return res.status(404).json({ error: 'Solicitud no encontrada' });
+  const { rows } = await query(
+    'SELECT * FROM reservas WHERE negocio_id = $1 AND telefono = $2 ORDER BY creado_en DESC',
+    [sol[0].negocio_id, sol[0].telefono]
+  );
+  res.json(rows);
+});
+
+adminRouter.put('/reservas/:id', requireAuth, async (req, res) => {
+  const { estado } = req.body;
+  const { rows } = await query(
+    'UPDATE reservas SET estado = COALESCE($2, estado) WHERE id = $1 RETURNING *',
+    [req.params.id, estado]
+  );
+  res.json(rows[0]);
+});
