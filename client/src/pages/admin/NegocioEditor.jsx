@@ -95,6 +95,15 @@ export default function NegocioEditor() {
           <select value={form.plantilla || 'generico'} onChange={set('plantilla')}>
             <option value="generico">Generico (estilo Tacos Memo)</option>
             <option value="resto-bar">Resto-bar</option>
+            <option value="estetica-barberia">Estetica / Barberia</option>
+          </select>
+        </div>
+        <div className="field">
+          <label>Funcion del bot (independiente de la plantilla visual)</label>
+          <select value={form.tipo_funcion || 'ninguna'} onChange={set('tipo_funcion')}>
+            <option value="ninguna">Ninguna (solo FAQ)</option>
+            <option value="pedidos">Pedidos (menu interactivo)</option>
+            <option value="citas">Citas (agenda interactiva)</option>
           </select>
         </div>
         <div className="field">

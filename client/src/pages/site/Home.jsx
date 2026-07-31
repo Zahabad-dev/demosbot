@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { api } from '../../lib/apiClient';
 import PlantillaGenerica from './templates/PlantillaGenerica';
 import PlantillaRestoBar from './templates/PlantillaRestoBar';
+import PlantillaEsteticaBarberia from './templates/PlantillaEsteticaBarberia';
 
 const PLANTILLAS = {
   generico: PlantillaGenerica,
   'resto-bar': PlantillaRestoBar,
+  'estetica-barberia': PlantillaEsteticaBarberia,
 };
 
 export default function Home() {

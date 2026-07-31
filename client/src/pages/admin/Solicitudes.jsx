@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { api } from '../../lib/apiClient';
 
 const ESTADOS_PEDIDO = ['Nuevo', 'En proceso', 'Completado'];
+const ESTADOS_CITA = ['Nueva', 'Confirmada', 'Completada', 'Cancelada'];
 
 function PedidosModal({ solicitudId, onClose }) {
   const [pedidos, setPedidos] = useState([]);
@@ -54,9 +55,56 @@ function PedidosModal({ solicitudId, onClose }) {
   );
 }
 
+function CitasModal({ solicitudId, onClose }) {
+  const [citas, setCitas] = useState([]);
+  const [cargando, setCargando] = useState(true);
+
+  const load = () =>
+    api.get(`/admin/solicitudes/${solicitudId}/citas`)
+      .then(setCitas)
+      .catch(() => setCitas([]))
+      .finally(() => setCargando(false));
+
+  useEffect(() => { load(); }, [solicitudId]);
+
+  const cambiarEstado = async (cita, estado) => {
+    await api.put(`/admin/citas/${cita.id}`, { estado });
+    load();
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-box-close" onClick={onClose}>✕</button>
+        <h2>Historial de citas</h2>
+        {cargando && <p style={{ color: '#9aa1ad' }}>Cargando…</p>}
+        {!cargando && citas.length === 0 && (
+          <p style={{ color: '#9aa1ad' }}>Este contacto todavía no ha agendado una cita desde la agenda interactiva.</p>
+        )}
+        {citas.map((c) => (
+          <div className="faq-row" key={c.id}>
+            <strong>Cita #{c.id} · {c.servicio || 'Servicio sin especificar'}</strong>
+            <span style={{ color: '#9aa1ad' }}>
+              {c.nombre_cliente || 'Sin nombre'} · {c.fecha || '—'} {c.horario || ''}
+            </span>
+            <span style={{ color: '#9aa1ad', fontSize: '0.8rem' }}>Solicitada: {new Date(c.creado_en).toLocaleString('es-MX')}</span>
+            <div className="field">
+              <label>Estatus de la cita</label>
+              <select value={c.estado} onChange={(e) => cambiarEstado(c, e.target.value)}>
+                {ESTADOS_CITA.map((e) => <option key={e} value={e}>{e}</option>)}
+              </select>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function SolicitudRow({ item, onUpdated }) {
   const [motivo, setMotivo] = useState('');
   const [pedidosAbierto, setPedidosAbierto] = useState(false);
+  const [citasAbierto, setCitasAbierto] = useState(false);
   const estaBaneado = item.estado === 'Baneado';
 
   const toggleBot = async () => {
@@ -99,6 +147,7 @@ function SolicitudRow({ item, onUpdated }) {
 
       <div className="faq-row-actions">
         <button className="secondary" onClick={() => setPedidosAbierto(true)}>Historial de pedidos</button>
+        <button className="secondary" onClick={() => setCitasAbierto(true)}>Historial de citas</button>
       </div>
 
       {estaBaneado ? (
@@ -118,6 +167,9 @@ function SolicitudRow({ item, onUpdated }) {
 
       {pedidosAbierto && (
         <PedidosModal solicitudId={item.id} onClose={() => setPedidosAbierto(false)} />
+      )}
+      {citasAbierto && (
+        <CitasModal solicitudId={item.id} onClose={() => setCitasAbierto(false)} />
       )}
     </div>
   );

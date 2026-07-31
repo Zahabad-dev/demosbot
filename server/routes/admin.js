@@ -45,7 +45,7 @@ adminRouter.get('/negocios/:negocioId', requireAuth, scopeNegocio, async (req, r
 });
 
 adminRouter.put('/negocios/:negocioId', requireAuth, scopeNegocio, async (req, res) => {
-  const { nombre, giro, ciudad, tono, system_prompt, whatsapp_numero, chatwoot_inbox_id, chatwoot_account_id, activo, plantilla, logo_data_url } = req.body;
+  const { nombre, giro, ciudad, tono, system_prompt, whatsapp_numero, chatwoot_inbox_id, chatwoot_account_id, activo, plantilla, logo_data_url, tipo_funcion } = req.body;
   const { rows } = await query(
     `UPDATE negocios SET
        nombre = COALESCE($2, nombre),
@@ -58,9 +58,10 @@ adminRouter.put('/negocios/:negocioId', requireAuth, scopeNegocio, async (req, r
        chatwoot_account_id = COALESCE($9, chatwoot_account_id),
        activo = COALESCE($10, activo),
        plantilla = COALESCE($11, plantilla),
-       logo_data_url = COALESCE($12, logo_data_url)
+       logo_data_url = COALESCE($12, logo_data_url),
+       tipo_funcion = COALESCE($13, tipo_funcion)
      WHERE id = $1 RETURNING *`,
-    [req.params.negocioId, nombre, giro, ciudad, tono, system_prompt, whatsapp_numero, chatwoot_inbox_id, chatwoot_account_id, activo, plantilla, logo_data_url]
+    [req.params.negocioId, nombre, giro, ciudad, tono, system_prompt, whatsapp_numero, chatwoot_inbox_id, chatwoot_account_id, activo, plantilla, logo_data_url, tipo_funcion]
   );
   res.json(rows[0]);
 });
@@ -187,6 +188,27 @@ adminRouter.put('/pedidos/:id', requireAuth, async (req, res) => {
   const { estado } = req.body;
   const { rows } = await query(
     'UPDATE pedidos SET estado = COALESCE($2, estado) WHERE id = $1 RETURNING *',
+    [req.params.id, estado]
+  );
+  res.json(rows[0]);
+});
+
+// --- Citas (generadas desde la agenda interactiva, insertadas por n8n) ---
+// Mismo patron que pedidos: relacion por negocio_id + telefono, no por FK directa.
+adminRouter.get('/solicitudes/:solicitudId/citas', requireAuth, async (req, res) => {
+  const { rows: sol } = await query('SELECT negocio_id, telefono FROM solicitudes WHERE id = $1', [req.params.solicitudId]);
+  if (!sol[0]) return res.status(404).json({ error: 'Solicitud no encontrada' });
+  const { rows } = await query(
+    'SELECT * FROM citas WHERE negocio_id = $1 AND telefono = $2 ORDER BY creado_en DESC',
+    [sol[0].negocio_id, sol[0].telefono]
+  );
+  res.json(rows);
+});
+
+adminRouter.put('/citas/:id', requireAuth, async (req, res) => {
+  const { estado } = req.body;
+  const { rows } = await query(
+    'UPDATE citas SET estado = COALESCE($2, estado) WHERE id = $1 RETURNING *',
     [req.params.id, estado]
   );
   res.json(rows[0]);

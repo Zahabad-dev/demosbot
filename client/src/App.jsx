@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Home from './pages/site/Home';
 import MenuInteractivo from './pages/site/MenuInteractivo';
+import AgendaInteractiva from './pages/site/AgendaInteractiva';
 import Login from './pages/admin/Login';
 import AdminLayout from './pages/admin/AdminLayout';
 import NegociosList from './pages/admin/NegociosList';
@@ -25,6 +26,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/menu/:slug" element={<MenuInteractivo />} />
+          <Route path="/agenda/:slug" element={<AgendaInteractiva />} />
           <Route path="/admin/login" element={<Login />} />
           <Route
             path="/admin"

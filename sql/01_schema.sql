@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS negocios (
   whatsapp_numero      VARCHAR(30),
   chatwoot_inbox_id    VARCHAR(50),                    -- inbox de Chatwoot conectado a este negocio
   chatwoot_account_id  VARCHAR(50),
-  plantilla      VARCHAR(50) NOT NULL DEFAULT 'generico', -- 'generico' | 'resto-bar' | ... (plantilla visual del sitio)
+  plantilla      VARCHAR(50) NOT NULL DEFAULT 'generico', -- 'generico' | 'resto-bar' | 'estetica-barberia' | ... (plantilla visual)
+  tipo_funcion   VARCHAR(20) NOT NULL DEFAULT 'ninguna', -- 'ninguna' | 'pedidos' | 'citas' — INDEPENDIENTE de `plantilla`
   logo_data_url  TEXT,                                 -- logo del negocio como data URL base64 (editable desde el panel)
   activo         BOOLEAN DEFAULT true,
   creado_en      TIMESTAMPTZ DEFAULT NOW(),
@@ -80,6 +81,23 @@ CREATE TABLE IF NOT EXISTS pedidos (
   actualizado_en TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Citas generadas desde la agenda interactiva (plantilla estetica-barberia). El bot de n8n
+-- las inserta al detectar el marcador [CITA_INTERACTIVA] en el mensaje de WhatsApp (nodo
+-- "Detectar Cita Interactiva"), solo para negocios con tipo_funcion = 'citas'. Igual que
+-- `pedidos`, se relaciona por negocio_id + telefono, no por FK a solicitudes.
+CREATE TABLE IF NOT EXISTS citas (
+  id             SERIAL PRIMARY KEY,
+  negocio_id     INTEGER NOT NULL REFERENCES negocios(id) ON DELETE CASCADE,
+  telefono       VARCHAR(30) NOT NULL,
+  nombre_cliente VARCHAR(150),
+  servicio       VARCHAR(150),
+  fecha          VARCHAR(50),                           -- texto libre para demo (ej. "Viernes")
+  horario        VARCHAR(50),                           -- texto libre para demo (ej. "5:00 pm")
+  estado         VARCHAR(30) DEFAULT 'Nueva',            -- Nueva | Confirmada | Completada | Cancelada
+  creado_en      TIMESTAMPTZ DEFAULT NOW(),
+  actualizado_en TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE IF NOT EXISTS admin_users (
   id             SERIAL PRIMARY KEY,
   negocio_id     INTEGER REFERENCES negocios(id) ON DELETE CASCADE, -- NULL = admin agencia (ve todos los negocios)
@@ -97,6 +115,8 @@ CREATE INDEX IF NOT EXISTS idx_solicitudes_negocio ON solicitudes(negocio_id);
 CREATE INDEX IF NOT EXISTS idx_solicitudes_telefono ON solicitudes(telefono);
 CREATE INDEX IF NOT EXISTS idx_pedidos_negocio ON pedidos(negocio_id);
 CREATE INDEX IF NOT EXISTS idx_pedidos_telefono ON pedidos(telefono);
+CREATE INDEX IF NOT EXISTS idx_citas_negocio ON citas(negocio_id);
+CREATE INDEX IF NOT EXISTS idx_citas_telefono ON citas(telefono);
 
 -- trigger genérico de actualizado_en
 CREATE OR REPLACE FUNCTION set_actualizado_en()
@@ -123,6 +143,10 @@ BEGIN
   END IF;
   IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_pedidos_upd') THEN
     CREATE TRIGGER trg_pedidos_upd BEFORE UPDATE ON pedidos
+      FOR EACH ROW EXECUTE FUNCTION set_actualizado_en();
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_citas_upd') THEN
+    CREATE TRIGGER trg_citas_upd BEFORE UPDATE ON citas
       FOR EACH ROW EXECUTE FUNCTION set_actualizado_en();
   END IF;
 END $$;
