@@ -96,6 +96,7 @@ export default function NegocioEditor() {
             <option value="generico">Generico (estilo Tacos Memo)</option>
             <option value="resto-bar">Resto-bar</option>
             <option value="estetica-barberia">Estetica / Barberia</option>
+            <option value="flora">Flora (restaurante elegante)</option>
           </select>
         </div>
         <div className="field">

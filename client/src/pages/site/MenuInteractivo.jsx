@@ -2,12 +2,13 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../../lib/apiClient';
 import '../../styles/resto-bar.css';
+import '../../styles/flora.css';
 
 const WHATSAPP_FALLBACK = '5217751667681';
 
 // Mismo menu de respaldo que la plantilla Resto-bar — se muestra si el negocio
 // todavia no tiene filas de FAQ con estas categorias (entradas/fuertes/bebidas/postres).
-const MENU_DEMO = {
+const MENU_DEMO_RESTOBAR = {
   entradas: [
     { pregunta: 'Botana de la casa', respuesta: 'Totopos, guacamole, pico de gallo y queso fundido. — $145', imagen_url: 'https://images.unsplash.com/photo-1582169296194-e4d644c48063?w=600&q=60&fit=crop&auto=format' },
     { pregunta: 'Alitas BBQ (8 pzas)', respuesta: 'Bañadas en salsa BBQ casera, con apio y aderezo ranch. — $165', imagen_url: 'https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&q=60&fit=crop&auto=format' },
@@ -26,6 +27,31 @@ const MENU_DEMO = {
   postres: [
     { pregunta: 'Volcán de chocolate', respuesta: 'Con helado de vainilla. — $95', imagen_url: 'https://images.unsplash.com/photo-1605807646983-377bc5a76493?w=600&q=60&fit=crop&auto=format' },
     { pregunta: 'Cheesecake de zarzamora', respuesta: 'Casero, con coulis de frutos rojos. — $90', imagen_url: 'https://images.unsplash.com/photo-1567171466295-4afa63d45416?w=600&q=60&fit=crop&auto=format' },
+  ],
+};
+
+// Menu de respaldo de la plantilla Flora — mismas categorias, contenido de cocina
+// de temporada/organica, para que ningun negocio 'resto-bar' se cruce con contenido
+// de 'flora' ni viceversa (cada plantilla trae su propio MENU_DEMO).
+const MENU_DEMO_FLORA = {
+  entradas: [
+    { pregunta: 'Ensalada de temporada', respuesta: 'Hojas mixtas del huerto, vinagreta de citricos y semillas tostadas. — $135', imagen_url: 'https://images.unsplash.com/photo-1675729378170-dff874aaaa24?w=600&q=60&fit=crop&auto=format' },
+    { pregunta: 'Tartara de betabel y queso de cabra', respuesta: 'Betabel asado, queso de cabra cremoso y nueces caramelizadas. — $150', imagen_url: 'https://images.unsplash.com/photo-1582983552131-5d59920a9476?w=600&q=60&fit=crop&auto=format' },
+    { pregunta: 'Carpaccio de calabacita', respuesta: 'Laminas finas de calabacita, parmesano y aceite de albahaca. — $140', imagen_url: 'https://images.unsplash.com/photo-1616671285410-2a676a9a433d?w=600&q=60&fit=crop&auto=format' },
+  ],
+  fuertes: [
+    { pregunta: 'Bacalao escalfado con hinojo y eneldo', respuesta: 'Bacalao del dia escalfado en mantequilla de hierbas, hinojo asado y eneldo fresco. — $265', imagen_url: 'https://images.unsplash.com/photo-1663530761401-15eefb544889?w=600&q=60&fit=crop&auto=format' },
+    { pregunta: 'Risotto de hongos silvestres', respuesta: 'Arroz cremoso, mezcla de hongos de temporada y trufa. — $210', imagen_url: 'https://images.unsplash.com/photo-1694021408920-922ff450c525?w=600&q=60&fit=crop&auto=format' },
+    { pregunta: 'Pechuga de pato con pure de zanahoria', respuesta: 'Pato a la plancha, pure de zanahoria asada y jus de naranja. — $255', imagen_url: 'https://images.unsplash.com/photo-1621494268492-d01b98eba7e4?w=600&q=60&fit=crop&auto=format' },
+  ],
+  bebidas: [
+    { pregunta: 'Copa de vino natural de la casa', respuesta: 'Seleccion rotativa de productores organicos. — $120', imagen_url: 'https://images.unsplash.com/photo-1585553616435-2dc0a54e271d?w=600&q=60&fit=crop&auto=format' },
+    { pregunta: 'Coctel de temporada', respuesta: 'Infusion de hierbas del huerto, citricos y mezcal. — $130', imagen_url: 'https://images.unsplash.com/photo-1563223771-5fe4038fbfc9?w=600&q=60&fit=crop&auto=format' },
+    { pregunta: 'Limonada de romero y jengibre', respuesta: 'Sin alcohol, refrescante y endulzada con miel. — $70', imagen_url: 'https://images.unsplash.com/photo-1596438214057-5ff7c7fa76b1?w=600&q=60&fit=crop&auto=format' },
+  ],
+  postres: [
+    { pregunta: 'Tarta de frutos rojos', respuesta: 'Masa quebrada, crema de vainilla y frutos del bosque. — $95', imagen_url: 'https://images.unsplash.com/photo-1785013045154-9ed0ca025e60?w=600&q=60&fit=crop&auto=format' },
+    { pregunta: 'Panna cotta de lavanda', respuesta: 'Con coulis de durazno y flor de lavanda. — $90', imagen_url: 'https://images.unsplash.com/photo-1784041948030-a3311992721a?w=600&q=60&fit=crop&auto=format' },
   ],
 };
 
@@ -58,6 +84,13 @@ export default function MenuInteractivo() {
       })
       .catch(() => setError(true));
   }, [slug]);
+
+  // La plantilla visual decide el "skin" (clases CSS + copy de respaldo) de este menu,
+  // pero la logica de seleccion/pedido es identica para cualquier negocio con
+  // tipo_funcion = 'pedidos' — asi nunca se mezcla contenido de una plantilla con otra.
+  const esFlora = negocio?.plantilla === 'flora';
+  const px = esFlora ? 'fl' : 'rb';
+  const MENU_DEMO = esFlora ? MENU_DEMO_FLORA : MENU_DEMO_RESTOBAR;
 
   const porCategoria = (clave) => {
     const propios = faq.filter((f) => f.categoria === clave);
@@ -92,20 +125,20 @@ export default function MenuInteractivo() {
   };
 
   return (
-    <div className="rb-page">
-      <header className="rb-hero rb-hero-compact">
-        {negocio?.logo_data_url && <img src={negocio.logo_data_url} alt="" className="rb-logo" />}
+    <div className={`${px}-page`}>
+      <header className={`${px}-hero ${px}-hero-compact`}>
+        {negocio?.logo_data_url && <img src={negocio.logo_data_url} alt="" className={`${px}-logo`} />}
         <h1>{negocio?.nombre || 'Menú'}</h1>
-        <p className="rb-tagline">MENÚ INTERACTIVO</p>
-        <p className="rb-sub">Selecciona lo que quieras y arma tu pedido para pedirlo en tu mesa.</p>
-        {error && <p className="rb-hint">(Demo sin conexión a la base de datos — así se verá con datos reales.)</p>}
+        <p className={`${px}-tagline`}>MENÚ INTERACTIVO</p>
+        <p className={esFlora ? 'fl-sub' : `${px}-sub`}>Selecciona lo que quieras y arma tu pedido para pedirlo en tu mesa.</p>
+        {error && <p className={`${px}-hint`}>(Demo sin conexión a la base de datos — así se verá con datos reales.)</p>}
       </header>
 
-      <nav className="rb-tabs">
+      <nav className={`${px}-tabs`}>
         {SECCIONES.map((s) => (
           <button
             key={s.key}
-            className={`rb-tab ${tabActiva === s.key ? 'rb-tab-activa' : ''}`}
+            className={`${px}-tab ${tabActiva === s.key ? `${px}-tab-activa` : ''}`}
             onClick={() => setTabActiva(s.key)}
           >
             {s.titulo}
@@ -113,52 +146,54 @@ export default function MenuInteractivo() {
         ))}
       </nav>
 
-      <section className="rb-section">
-        <div className="rb-grid">
+      <section className={`${px}-section`}>
+        <div className={`${px}-grid`}>
           {porCategoria(tabActiva).map((item, i) => (
-            <div className={`rb-card ${estaSeleccionado(item) ? 'rb-card-seleccionada' : ''}`} key={i}>
+            <div className={`${px}-card ${estaSeleccionado(item) ? `${px}-card-seleccionada` : ''}`} key={i}>
               {item.imagen_url ? (
-                <img src={item.imagen_url} alt={item.pregunta} className="rb-card-img" />
+                <img src={item.imagen_url} alt={item.pregunta} className={`${px}-card-img`} />
               ) : (
-                <div className="rb-card-img rb-card-img-placeholder">🍽️</div>
+                <div className={`${px}-card-img ${px}-card-img-placeholder`}>🍽️</div>
               )}
-              <h3>{item.pregunta}</h3>
-              <p>{item.respuesta}</p>
-              <div className="rb-card-actions">
-                <button className="rb-card-link" onClick={() => setItemAbierto(item)}>Ver más ⤢</button>
-                <button
-                  className={`rb-select-btn ${estaSeleccionado(item) ? 'rb-select-btn-activo' : ''}`}
-                  onClick={() => toggleSeleccion(item)}
-                >
-                  {estaSeleccionado(item) ? '✓ Agregado' : '+ Agregar'}
-                </button>
+              <div className={esFlora ? 'fl-card-body' : ''}>
+                <h3>{item.pregunta}</h3>
+                <p>{item.respuesta}</p>
+                <div className={`${px}-card-actions`}>
+                  <button className={`${px}-card-link`} onClick={() => setItemAbierto(item)}>Ver más ⤢</button>
+                  <button
+                    className={`${px}-select-btn ${estaSeleccionado(item) ? `${px}-select-btn-activo` : ''}`}
+                    onClick={() => toggleSeleccion(item)}
+                  >
+                    {estaSeleccionado(item) ? '✓ Agregado' : '+ Agregar'}
+                  </button>
+                </div>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      <div className="rb-orden-bar">
+      <div className={`${px}-orden-bar`}>
         <button
-          className="rb-cta rb-cta-fixed"
+          className={`${px}-cta ${px}-cta-fixed`}
           onClick={() => setResumenAbierto(true)}
           disabled={seleccionados.length === 0}
         >
           Pedido listo{seleccionados.length > 0 && ` (${seleccionados.length})`}
         </button>
-        <button className="rb-link-domicilio" onClick={() => setEntregaAbierto(true)}>
+        <button className={`${px}-link-domicilio`} onClick={() => setEntregaAbierto(true)}>
           ¿Vas a pedir a domicilio? Escríbenos por WhatsApp
         </button>
       </div>
 
       {itemAbierto && (
-        <div className="rb-modal-overlay" onClick={() => setItemAbierto(null)}>
-          <div className="rb-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="rb-modal-close" onClick={() => setItemAbierto(null)}>✕</button>
+        <div className={`${px}-modal-overlay`} onClick={() => setItemAbierto(null)}>
+          <div className={`${px}-modal`} onClick={(e) => e.stopPropagation()}>
+            <button className={`${px}-modal-close`} onClick={() => setItemAbierto(null)}>✕</button>
             {itemAbierto.imagen_url ? (
-              <img src={itemAbierto.imagen_url} alt={itemAbierto.pregunta} className="rb-modal-img" />
+              <img src={itemAbierto.imagen_url} alt={itemAbierto.pregunta} className={`${px}-modal-img`} />
             ) : (
-              <div className="rb-modal-img rb-card-img-placeholder">🍽️</div>
+              <div className={`${px}-modal-img ${px}-card-img-placeholder`}>🍽️</div>
             )}
             <h2>{itemAbierto.pregunta}</h2>
             <p>{itemAbierto.respuesta}</p>
@@ -167,11 +202,11 @@ export default function MenuInteractivo() {
       )}
 
       {resumenAbierto && (
-        <div className="rb-modal-overlay" onClick={() => setResumenAbierto(false)}>
-          <div className="rb-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="rb-modal-close" onClick={() => setResumenAbierto(false)}>✕</button>
+        <div className={`${px}-modal-overlay`} onClick={() => setResumenAbierto(false)}>
+          <div className={`${px}-modal`} onClick={(e) => e.stopPropagation()}>
+            <button className={`${px}-modal-close`} onClick={() => setResumenAbierto(false)}>✕</button>
             <h2>Tu pedido</h2>
-            <ul className="rb-resumen-lista">
+            <ul className={`${px}-resumen-lista`}>
               {seleccionados.map((it, i) => (
                 <li key={i}>
                   <strong>{it.pregunta}</strong>
@@ -179,7 +214,7 @@ export default function MenuInteractivo() {
                 </li>
               ))}
             </ul>
-            <p className="rb-resumen-aviso">
+            <p className={`${px}-resumen-aviso`}>
               👋 Indícale esto a tu mesero para ordenar — este resumen es solo para ti, no se envía
               automáticamente a nadie.
             </p>
@@ -188,16 +223,16 @@ export default function MenuInteractivo() {
       )}
 
       {entregaAbierto && (
-        <div className="rb-modal-overlay" onClick={() => setEntregaAbierto(false)}>
-          <div className="rb-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="rb-modal-close" onClick={() => setEntregaAbierto(false)}>✕</button>
+        <div className={`${px}-modal-overlay`} onClick={() => setEntregaAbierto(false)}>
+          <div className={`${px}-modal`} onClick={(e) => e.stopPropagation()}>
+            <button className={`${px}-modal-close`} onClick={() => setEntregaAbierto(false)}>✕</button>
             <h2>¿Cómo quieres tu pedido?</h2>
-            <div className="rb-entrega-opciones">
-              <button className="rb-entrega-btn" onClick={() => pedirPorWhatsapp('pickup')}>
+            <div className={`${px}-entrega-opciones`}>
+              <button className={`${px}-entrega-btn`} onClick={() => pedirPorWhatsapp('pickup')}>
                 🚶 Paso por él
                 <span>Recoges tu pedido directo en el local</span>
               </button>
-              <button className="rb-entrega-btn" onClick={() => pedirPorWhatsapp('domicilio')}>
+              <button className={`${px}-entrega-btn`} onClick={() => pedirPorWhatsapp('domicilio')}>
                 🛵 A domicilio
                 <span>Te lo llevamos a tu dirección</span>
               </button>
@@ -206,9 +241,9 @@ export default function MenuInteractivo() {
         </div>
       )}
 
-      <footer className="rb-footer">
+      <footer className={`${px}-footer`}>
         <p>{negocio?.nombre || ''} · {negocio?.ciudad || ''}</p>
-        <p className="rb-powered">Demo del ecosistema de bots — Black Sheep Agencia</p>
+        <p className={`${px}-powered`}>Demo del ecosistema de bots — Black Sheep Agencia</p>
       </footer>
     </div>
   );

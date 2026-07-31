@@ -3,11 +3,13 @@ import { api } from '../../lib/apiClient';
 import PlantillaGenerica from './templates/PlantillaGenerica';
 import PlantillaRestoBar from './templates/PlantillaRestoBar';
 import PlantillaEsteticaBarberia from './templates/PlantillaEsteticaBarberia';
+import PlantillaElegante from './templates/PlantillaElegante';
 
 const PLANTILLAS = {
   generico: PlantillaGenerica,
   'resto-bar': PlantillaRestoBar,
   'estetica-barberia': PlantillaEsteticaBarberia,
+  flora: PlantillaElegante,
 };
 
 export default function Home() {
