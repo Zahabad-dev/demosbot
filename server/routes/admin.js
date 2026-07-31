@@ -26,12 +26,20 @@ adminRouter.post('/logout', (req, res) => {
 adminRouter.get('/me', requireAuth, (req, res) => res.json({ user: req.auth }));
 
 // Lista de negocios visibles para el admin logueado (agencia ve todos, cliente solo el suyo).
+// "pendientes" suma pedidos/citas/reservas nuevos + solicitudes no leidas de ese negocio —
+// se usa como badge de notificacion junto al link "Solicitudes" de cada fila.
 adminRouter.get('/negocios', requireAuth, async (req, res) => {
   const isAgencia = req.auth.rol === 'agencia';
   const { rows } = await query(
-    `SELECT id, slug, nombre, giro, ciudad, tono, activo FROM negocios
-     WHERE $1 = true OR id = $2
-     ORDER BY nombre`,
+    `SELECT n.id, n.slug, n.nombre, n.giro, n.ciudad, n.tono, n.activo,
+       COALESCE(p.pendientes, 0) + COALESCE(c.pendientes, 0) + COALESCE(r.pendientes, 0) + COALESCE(s.pendientes, 0) AS pendientes
+     FROM negocios n
+     LEFT JOIN (SELECT negocio_id, COUNT(*) AS pendientes FROM pedidos WHERE estado = 'Nuevo' GROUP BY negocio_id) p ON p.negocio_id = n.id
+     LEFT JOIN (SELECT negocio_id, COUNT(*) AS pendientes FROM citas WHERE estado = 'Nueva' GROUP BY negocio_id) c ON c.negocio_id = n.id
+     LEFT JOIN (SELECT negocio_id, COUNT(*) AS pendientes FROM reservas WHERE estado = 'Nueva' GROUP BY negocio_id) r ON r.negocio_id = n.id
+     LEFT JOIN (SELECT negocio_id, COUNT(*) AS pendientes FROM solicitudes WHERE leido = false GROUP BY negocio_id) s ON s.negocio_id = n.id
+     WHERE $1 = true OR n.id = $2
+     ORDER BY n.nombre`,
     [isAgencia, req.auth.negocioId]
   );
   res.json(rows);
@@ -149,9 +157,20 @@ adminRouter.put('/links/:id', requireAuth, async (req, res) => {
 });
 
 // --- Solicitudes / leads ---
+// Incluye conteos de pedidos/citas/reservas "Nuevo(a)" por contacto, para mostrar el badge
+// en los botones "Historial de..." sin tener que abrir cada modal.
 adminRouter.get('/negocios/:negocioId/solicitudes', requireAuth, scopeNegocio, async (req, res) => {
   const { rows } = await query(
-    'SELECT * FROM solicitudes WHERE negocio_id = $1 ORDER BY actualizado_en DESC LIMIT 200',
+    `SELECT s.*,
+       COALESCE(p.pendientes, 0) AS pedidos_nuevos,
+       COALESCE(c.pendientes, 0) AS citas_nuevas,
+       COALESCE(r.pendientes, 0) AS reservas_nuevas
+     FROM solicitudes s
+     LEFT JOIN (SELECT negocio_id, telefono, COUNT(*) AS pendientes FROM pedidos WHERE estado = 'Nuevo' GROUP BY negocio_id, telefono) p ON p.negocio_id = s.negocio_id AND p.telefono = s.telefono
+     LEFT JOIN (SELECT negocio_id, telefono, COUNT(*) AS pendientes FROM citas WHERE estado = 'Nueva' GROUP BY negocio_id, telefono) c ON c.negocio_id = s.negocio_id AND c.telefono = s.telefono
+     LEFT JOIN (SELECT negocio_id, telefono, COUNT(*) AS pendientes FROM reservas WHERE estado = 'Nueva' GROUP BY negocio_id, telefono) r ON r.negocio_id = s.negocio_id AND r.telefono = s.telefono
+     WHERE s.negocio_id = $1
+     ORDER BY s.actualizado_en DESC LIMIT 200`,
     [req.params.negocioId]
   );
   res.json(rows);

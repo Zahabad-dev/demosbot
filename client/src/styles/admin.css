@@ -172,6 +172,36 @@
   margin-left: 0.5rem;
   vertical-align: middle;
 }
+
+/* Contador de "nuevo/pendiente" — pedidos/citas/reservas sin revisar, o negocios con
+   solicitudes que requieren atencion (ver Solicitudes.jsx y NegociosList.jsx). */
+.badge-notificacion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.2rem;
+  height: 1.2rem;
+  padding: 0 0.3rem;
+  background: #F5C518;
+  color: #1e232c;
+  font-size: 0.7rem;
+  font-weight: 800;
+  border-radius: 999px;
+  margin-left: 0.4rem;
+}
+
+.badge-atencion {
+  display: inline-block;
+  background: rgba(245, 197, 24, 0.15);
+  color: #F5C518;
+  border: 1px solid #F5C518;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
 .error-msg { color: #ff8080; font-size: 0.9rem; }
 
 @media (max-width: 768px) {

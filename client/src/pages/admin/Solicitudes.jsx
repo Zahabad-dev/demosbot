@@ -178,10 +178,16 @@ function SolicitudRow({ item, onUpdated }) {
     onUpdated();
   };
 
+  const marcarAtendido = async () => {
+    await api.put(`/admin/solicitudes/${item.id}`, { leido: true });
+    onUpdated();
+  };
+
   return (
     <div className="faq-row">
       <strong>
         {item.nombre_contacto || item.telefono} {estaBaneado && <span className="badge-baneado">Baneado</span>}
+        {!item.leido && <span className="badge-atencion">Requiere atención</span>}
       </strong>
       <span style={{ color: '#9aa1ad' }}>{item.telefono} · {item.canal} · {item.estado}</span>
       <p>{item.ultimo_mensaje}</p>
@@ -191,12 +197,21 @@ function SolicitudRow({ item, onUpdated }) {
         <button className="secondary" onClick={toggleBot}>
           {item.bot_bloqueado ? 'Reactivar bot' : 'Pausar bot (tomar yo la conversación)'}
         </button>
+        {!item.leido && (
+          <button className="secondary" onClick={marcarAtendido}>Marcar como atendido</button>
+        )}
       </div>
 
       <div className="faq-row-actions">
-        <button className="secondary" onClick={() => setPedidosAbierto(true)}>Historial de pedidos</button>
-        <button className="secondary" onClick={() => setCitasAbierto(true)}>Historial de citas</button>
-        <button className="secondary" onClick={() => setReservasAbierto(true)}>Historial de reservas</button>
+        <button className="secondary" onClick={() => setPedidosAbierto(true)}>
+          Historial de pedidos{item.pedidos_nuevos > 0 && <span className="badge-notificacion">{item.pedidos_nuevos}</span>}
+        </button>
+        <button className="secondary" onClick={() => setCitasAbierto(true)}>
+          Historial de citas{item.citas_nuevas > 0 && <span className="badge-notificacion">{item.citas_nuevas}</span>}
+        </button>
+        <button className="secondary" onClick={() => setReservasAbierto(true)}>
+          Historial de reservas{item.reservas_nuevas > 0 && <span className="badge-notificacion">{item.reservas_nuevas}</span>}
+        </button>
       </div>
 
       {estaBaneado ? (

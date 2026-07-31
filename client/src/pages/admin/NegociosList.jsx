@@ -69,7 +69,11 @@ export default function NegociosList() {
             )}
             <Link to={`/admin/negocios/${n.id}`}><button className="secondary">Editar bot</button></Link>
             <Link to={`/admin/negocios/${n.id}/faq`}><button className="secondary">FAQ</button></Link>
-            <Link to={`/admin/negocios/${n.id}/solicitudes`}><button className="secondary">Solicitudes</button></Link>
+            <Link to={`/admin/negocios/${n.id}/solicitudes`}>
+              <button className="secondary">
+                Solicitudes{n.pendientes > 0 && <span className="badge-notificacion">{n.pendientes}</span>}
+              </button>
+            </Link>
           </div>
         </div>
       ))}
