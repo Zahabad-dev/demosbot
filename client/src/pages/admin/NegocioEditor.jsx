@@ -97,6 +97,7 @@ export default function NegocioEditor() {
             <option value="resto-bar">Resto-bar</option>
             <option value="estetica-barberia">Estetica / Barberia</option>
             <option value="flora">Flora (restaurante elegante)</option>
+            <option value="garage">Garage (lote de autos)</option>
           </select>
         </div>
         <div className="field">

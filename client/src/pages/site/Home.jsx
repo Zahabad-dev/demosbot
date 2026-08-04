@@ -4,12 +4,14 @@ import PlantillaGenerica from './templates/PlantillaGenerica';
 import PlantillaRestoBar from './templates/PlantillaRestoBar';
 import PlantillaEsteticaBarberia from './templates/PlantillaEsteticaBarberia';
 import PlantillaElegante from './templates/PlantillaElegante';
+import PlantillaGarage from './templates/PlantillaGarage';
 
 const PLANTILLAS = {
   generico: PlantillaGenerica,
   'resto-bar': PlantillaRestoBar,
   'estetica-barberia': PlantillaEsteticaBarberia,
   flora: PlantillaElegante,
+  garage: PlantillaGarage,
 };
 
 export default function Home() {

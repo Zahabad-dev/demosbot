@@ -2,16 +2,25 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../../lib/apiClient';
 import '../../styles/estetica-barberia.css';
+import '../../styles/garage.css';
 
 const WHATSAPP_FALLBACK = '5217751667681';
 
-const SERVICIOS_DEMO = [
+const SERVICIOS_DEMO_ESTETICA = [
   { pregunta: 'Corte y peinado', respuesta: 'Corte a la medida + peinado con plancha o tenaza. — $250 · 45 min' },
   { pregunta: 'Manicure spa', respuesta: 'Limado, cutícula, masaje y esmaltado. — $220 · 40 min' },
   { pregunta: 'Pedicure spa', respuesta: 'Exfoliación, masaje y esmaltado. — $250 · 50 min' },
   { pregunta: 'Facial hidratante', respuesta: 'Limpieza profunda + mascarilla hidratante. — $350 · 60 min' },
   { pregunta: 'Depilación de cejas', respuesta: 'Diseño y depilación con cera o hilo. — $120 · 15 min' },
   { pregunta: 'Maquillaje social', respuesta: 'Maquillaje para evento, incluye pestañas. — $450 · 60 min' },
+];
+
+// Mismo fallback que usa la plantilla Garage — se muestra si el negocio todavia no
+// tiene FAQ propia con categoria "servicios" (aqui cada "servicio" es un vehiculo).
+const SERVICIOS_DEMO_GARAGE = [
+  { pregunta: 'Sedán deportivo 2023', respuesta: 'Motor turbo, único dueño, 28,000 km. — $385,000' },
+  { pregunta: 'Camioneta 4x4 2022', respuesta: 'Doble cabina, 4x4, listo para carretera u off-road. — $520,000' },
+  { pregunta: 'SUV familiar 2023', respuesta: '7 pasajeros, cámara de reversa, garantía vigente. — $460,000' },
 ];
 
 const DIAS = ['Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
@@ -38,6 +47,11 @@ export default function AgendaInteractiva() {
       .catch(() => setError(true));
   }, [slug]);
 
+  const esGarage = negocio?.plantilla === 'garage';
+  const px = esGarage ? 'gr' : 'eb';
+  const SERVICIOS_DEMO = esGarage ? SERVICIOS_DEMO_GARAGE : SERVICIOS_DEMO_ESTETICA;
+  const tituloPaso2 = esGarage ? '2. Elige el auto' : '2. Elige tu servicio';
+
   const servicios = faq.filter((f) => f.categoria === 'servicios');
   const serviciosMostrados = servicios.length > 0 ? servicios : SERVICIOS_DEMO;
 
@@ -57,53 +71,60 @@ export default function AgendaInteractiva() {
   };
 
   return (
-    <div className="eb-page">
-      <header className="eb-hero eb-hero-compact">
-        {negocio?.logo_data_url && <img src={negocio.logo_data_url} alt="" className="eb-logo" />}
-        <h1>{negocio?.nombre || 'Glow Studio'}</h1>
-        <p className="eb-tagline">AGENDA TU CITA</p>
-        {error && <p className="eb-hint">(Demo sin conexión a la base de datos — así se verá con datos reales.)</p>}
+    <div className={`${px}-page`}>
+      <header className={`${px}-hero ${px}-hero-compact`}>
+        {negocio?.logo_data_url && <img src={negocio.logo_data_url} alt="" className={`${px}-logo`} />}
+        <h1>{negocio?.nombre || (esGarage ? 'Mr. Garage' : 'Glow Studio')}</h1>
+        <p className={`${px}-tagline`}>{esGarage ? 'AGENDA TU PRUEBA DE MANEJO' : 'AGENDA TU CITA'}</p>
+        {error && <p className={`${px}-hint`}>(Demo sin conexión a la base de datos — así se verá con datos reales.)</p>}
       </header>
 
-      <section className="eb-section">
+      <section className={`${px}-section`}>
         <h2>1. Tu nombre</h2>
-        <label className="eb-field-label">¿Cómo te llamas?</label>
+        <label className={`${px}-field-label`}>¿Cómo te llamas?</label>
         <input
-          className="eb-input"
+          className={`${px}-input`}
           value={nombreCliente}
           onChange={(e) => setNombreCliente(e.target.value)}
           placeholder="Ej. Ana Torres"
         />
       </section>
 
-      <section className="eb-section">
-        <h2>2. Elige tu servicio</h2>
-        <div className="eb-grid">
+      <section className={`${px}-section`}>
+        <h2>{tituloPaso2}</h2>
+        <div className={`${px}-grid`}>
           {serviciosMostrados.map((item, i) => (
             <button
               key={i}
-              className={`eb-servicio-card ${servicioSeleccionado?.pregunta === item.pregunta ? 'eb-servicio-card-activa' : ''}`}
+              className={`${px}-servicio-card ${servicioSeleccionado?.pregunta === item.pregunta ? `${px}-servicio-card-activa` : ''}`}
               onClick={() => setServicioSeleccionado(item)}
             >
-              <h3>{item.pregunta}</h3>
-              <p>{item.respuesta}</p>
+              {esGarage && (item.imagen_url ? (
+                <img src={item.imagen_url} alt={item.pregunta} className="gr-card-img" />
+              ) : (
+                <div className="gr-card-img gr-card-img-placeholder">🚗</div>
+              ))}
+              <div className={esGarage ? 'gr-servicio-card-body' : ''}>
+                <h3>{item.pregunta}</h3>
+                <p>{item.respuesta}</p>
+              </div>
             </button>
           ))}
         </div>
       </section>
 
-      <section className="eb-section">
+      <section className={`${px}-section`}>
         <h2>3. Elige día y horario</h2>
         {DIAS.map((dia) => (
           <div key={dia} style={{ marginBottom: '1rem' }}>
             <p style={{ textAlign: 'center', fontWeight: 700, marginBottom: '0.5rem' }}>{dia}</p>
-            <div className="eb-agenda-grid">
+            <div className={`${px}-agenda-grid`}>
               {HORAS.map((hora) => {
                 const activo = slotSeleccionado?.dia === dia && slotSeleccionado?.hora === hora;
                 return (
                   <button
                     key={hora}
-                    className={`eb-slot ${activo ? 'eb-slot-activo' : ''}`}
+                    className={`${px}-slot ${activo ? `${px}-slot-activo` : ''}`}
                     onClick={() => setSlotSeleccionado({ dia, hora })}
                   >
                     {hora}
@@ -115,15 +136,15 @@ export default function AgendaInteractiva() {
         ))}
       </section>
 
-      <div className="eb-agenda-bar">
-        <button className="eb-cta" onClick={agendarPorWhatsapp} disabled={!listo}>
-          Agendar por WhatsApp
+      <div className={`${px}-agenda-bar`}>
+        <button className={`${px}-cta`} onClick={agendarPorWhatsapp} disabled={!listo}>
+          {esGarage ? 'Agendar prueba por WhatsApp' : 'Agendar por WhatsApp'}
         </button>
       </div>
 
-      <footer className="eb-footer">
+      <footer className={`${px}-footer`}>
         <p>{negocio?.nombre || ''} · {negocio?.ciudad || ''}</p>
-        <p className="eb-powered">Demo del ecosistema de bots — Black Sheep Agencia</p>
+        <p className={`${px}-powered`}>Demo del ecosistema de bots — Black Sheep Agencia</p>
       </footer>
     </div>
   );

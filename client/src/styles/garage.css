@@ -1,0 +1,307 @@
+/* Plantilla Garage — agencia/lote de autos, estilo agresivo negro + rojo racing.
+   Tipografia Anton (headlines bold condensada) + Rajdhani (tech/sans), inspirada
+   en branding de venta de autos tipo "cars sale" — a proposito distinta de las
+   demas plantillas (sin dorado, sin serif elegante, sin sticker neo-brutalista). */
+
+:root {
+  --gr-black: #0a0a0a;
+  --gr-black-soft: #161616;
+  --gr-red: #e10600;
+  --gr-red-dark: #a30400;
+  --gr-white: #f5f5f5;
+  --gr-gray: #9a9a9a;
+  --gr-line: #2a2a2a;
+}
+
+.gr-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Rajdhani', 'Segoe UI', system-ui, sans-serif;
+  background: var(--gr-black);
+  color: var(--gr-white);
+}
+
+.gr-hero {
+  background: var(--gr-black);
+  text-align: center;
+  padding: 3.5rem 1.5rem 3rem;
+  border-bottom: 3px solid var(--gr-red);
+}
+
+.gr-logo {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  border-radius: 999px;
+  background: var(--gr-black-soft);
+  border: 2px solid var(--gr-red);
+  padding: 0.5rem;
+  margin: 0 auto 1.25rem;
+  display: block;
+}
+
+.gr-badge {
+  display: inline-block;
+  background: var(--gr-red);
+  color: var(--gr-white);
+  padding: 0.3rem 1rem;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 1.25rem;
+}
+
+.gr-hero h1 {
+  font-family: 'Anton', 'Rajdhani', sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: clamp(2.6rem, 8vw, 4.6rem);
+  margin: 0.2rem 0;
+  color: var(--gr-white);
+  line-height: 0.95;
+}
+
+.gr-hero h1 span { color: var(--gr-red); }
+
+.gr-tagline {
+  color: var(--gr-red);
+  font-weight: 700;
+  letter-spacing: 3px;
+  font-size: clamp(0.75rem, 2vw, 0.95rem);
+  margin: 0.5rem 0 1.25rem;
+  text-transform: uppercase;
+}
+
+.gr-sub { max-width: 30rem; margin: 0 auto; color: var(--gr-gray); }
+.gr-hint { margin-top: 1rem; font-size: 0.8rem; color: var(--gr-gray); }
+
+.gr-hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1.5rem; }
+
+.gr-qr-section {
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  background: var(--gr-black-soft);
+}
+
+.gr-qr-card {
+  background: var(--gr-white);
+  border-radius: 0.4rem;
+  padding: 1.5rem;
+  text-align: center;
+  max-width: 22rem;
+}
+
+.gr-qr-img { width: 100%; max-width: 200px; }
+.gr-qr-caption { font-size: 0.8rem; color: #444; margin-top: 0.9rem; }
+
+.gr-qr-download {
+  display: inline-block;
+  margin-top: 0.9rem;
+  background: var(--gr-black);
+  color: var(--gr-red);
+  border: 1px solid var(--gr-red);
+  padding: 0.5rem 1.2rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.gr-cta {
+  display: inline-block;
+  background: var(--gr-red);
+  color: var(--gr-white);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 0.85rem 1.9rem;
+  border-radius: 3px;
+  border: 2px solid var(--gr-red);
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.gr-cta:hover { background: var(--gr-red-dark); border-color: var(--gr-red-dark); }
+
+.gr-cta.gr-cta-outline { background: transparent; color: var(--gr-white); border-color: var(--gr-white); }
+.gr-cta.gr-cta-outline:hover { border-color: var(--gr-red); color: var(--gr-red); background: transparent; }
+
+.gr-cards-row {
+  max-width: 74rem;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--gr-line);
+}
+
+.gr-mini-card {
+  background: var(--gr-black);
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+}
+
+.gr-mini-card h3 { font-family: 'Anton', sans-serif; font-weight: 400; text-transform: uppercase; letter-spacing: 0.5px; font-size: 1.05rem; margin: 0 0 0.6rem; }
+.gr-mini-card a { color: var(--gr-red); font-size: 0.85rem; text-decoration: underline; font-weight: 600; }
+
+.gr-section { padding: 2.5rem 1.5rem; max-width: 74rem; margin: 0 auto; width: 100%; }
+.gr-section h2 {
+  text-align: center;
+  font-family: 'Anton', sans-serif;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1.75rem;
+  font-size: 1.7rem;
+}
+
+.gr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.gr-card {
+  background: var(--gr-black-soft);
+  border-radius: 0.4rem;
+  overflow: hidden;
+  border: 1px solid var(--gr-line);
+  position: relative;
+}
+
+.gr-card-img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  background: var(--gr-black);
+}
+
+.gr-card-img-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.4rem;
+}
+
+.gr-card-body { padding: 1.1rem 1.25rem 1.25rem; }
+.gr-card h3 { margin: 0 0 0.35rem; font-family: 'Anton', sans-serif; font-weight: 400; text-transform: uppercase; letter-spacing: 0.5px; font-size: 1.05rem; }
+.gr-card p { margin: 0; color: var(--gr-gray); line-height: 1.45; font-size: 0.92rem; }
+
+.gr-footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 2.25rem 1rem;
+  background: var(--gr-black-soft);
+  color: var(--gr-gray);
+  border-top: 3px solid var(--gr-red);
+}
+
+.gr-powered { opacity: 0.7; font-size: 0.8rem; margin-top: 0.25rem; }
+
+/* --- Agenda interactiva / catalogo (/agenda/:slug) --- */
+
+.gr-hero-compact { padding: 2.25rem 1.5rem 1.5rem; }
+.gr-hero-compact h1 { font-size: clamp(2rem, 6vw, 2.8rem); }
+
+.gr-field-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gr-white);
+  margin: 0 auto 0.6rem;
+  max-width: 30rem;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.gr-input {
+  display: block;
+  width: 100%;
+  max-width: 30rem;
+  margin: 0 auto 1.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--gr-line);
+  border-radius: 0.3rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: var(--gr-black-soft);
+  color: var(--gr-white);
+}
+
+.gr-servicio-card {
+  background: var(--gr-black-soft);
+  border: 1px solid var(--gr-line);
+  border-radius: 0.4rem;
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+  color: var(--gr-white);
+  padding: 0;
+}
+
+.gr-servicio-card-body { padding: 1.1rem; }
+.gr-servicio-card h3 { margin: 0 0 0.3rem; font-family: 'Anton', sans-serif; font-weight: 400; text-transform: uppercase; font-size: 1rem; }
+.gr-servicio-card p { margin: 0; font-size: 0.85rem; color: var(--gr-gray); }
+
+.gr-servicio-card-activa { border-color: var(--gr-red); border-width: 2px; }
+
+.gr-agenda-grid {
+  max-width: 34rem;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.6rem;
+}
+
+.gr-slot {
+  background: var(--gr-black-soft);
+  border: 1px solid var(--gr-line);
+  border-radius: 0.3rem;
+  padding: 0.6rem 0.4rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: center;
+  font-family: inherit;
+  color: var(--gr-white);
+}
+
+.gr-slot-activo { background: var(--gr-red); color: var(--gr-white); border-color: var(--gr-red); font-weight: 700; }
+
+.gr-agenda-bar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem 1.25rem 1.75rem;
+  background: linear-gradient(180deg, rgba(10,10,10,0) 0%, var(--gr-black) 35%);
+}
+
+.gr-cta:disabled {
+  background: var(--gr-line);
+  border-color: var(--gr-line);
+  color: var(--gr-gray);
+  cursor: not-allowed;
+}
+
+@media (max-width: 860px) {
+  .gr-cards-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .gr-hero { padding: 2.5rem 1.25rem; }
+  .gr-section { padding: 2.25rem 1.25rem; }
+  .gr-cta { width: 100%; text-align: center; }
+  .gr-hero-actions { flex-direction: column; }
+}
