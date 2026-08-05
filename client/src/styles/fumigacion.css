@@ -1,0 +1,255 @@
+/* Plantilla Fumigacion — control de plagas. Blanco + verde seguro/eco (transmite "control
+   de plagas sin riesgo para tu familia"), tipografia Sora limpia y moderna. Distinta de
+   Medicina (teal) y de Sanitizacion (azul) aunque las tres sean del sector "salud/limpieza". */
+
+:root {
+  --fm-white: #ffffff;
+  --fm-bg: #f4f9f4;
+  --fm-green: #1f8a4c;
+  --fm-green-dark: #146638;
+  --fm-ink: #16241a;
+  --fm-gray: #64756a;
+  --fm-line: #dcebe0;
+}
+
+.fm-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Sora', 'Segoe UI', system-ui, sans-serif;
+  background: var(--fm-bg);
+  color: var(--fm-ink);
+}
+
+.fm-page h1, .fm-page h2, .fm-page h3 { font-family: 'Sora', sans-serif; font-weight: 700; }
+
+.fm-hero {
+  background: var(--fm-white);
+  text-align: center;
+  padding: 3.5rem 1.5rem 3rem;
+  border-bottom: 1px solid var(--fm-line);
+}
+
+.fm-logo {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  border-radius: 999px;
+  background: var(--fm-bg);
+  border: 2px solid var(--fm-green);
+  padding: 0.5rem;
+  margin: 0 auto 1.25rem;
+  display: block;
+}
+
+.fm-badge {
+  display: inline-block;
+  background: rgba(31, 138, 76, 0.1);
+  color: var(--fm-green-dark);
+  padding: 0.3rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+}
+
+.fm-hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); margin: 0.2rem 0; }
+
+.fm-tagline {
+  color: var(--fm-green);
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-size: clamp(0.7rem, 2vw, 0.85rem);
+  margin: 0.5rem 0 1.25rem;
+  text-transform: uppercase;
+}
+
+.fm-sub { max-width: 30rem; margin: 0 auto; color: var(--fm-gray); }
+.fm-hint { margin-top: 1rem; font-size: 0.8rem; color: var(--fm-gray); }
+
+.fm-hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1.5rem; }
+
+.fm-qr-section {
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  background: var(--fm-bg);
+}
+
+.fm-qr-card {
+  background: var(--fm-white);
+  border-radius: 0.6rem;
+  padding: 1.5rem;
+  text-align: center;
+  max-width: 22rem;
+  border: 1px solid var(--fm-line);
+}
+
+.fm-qr-img { width: 100%; max-width: 200px; border-radius: 0.3rem; }
+.fm-qr-caption { font-size: 0.8rem; color: var(--fm-gray); margin-top: 0.9rem; }
+
+.fm-qr-download {
+  display: inline-block;
+  margin-top: 0.9rem;
+  color: var(--fm-green-dark);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: underline;
+}
+
+.fm-cta {
+  display: inline-block;
+  background: var(--fm-green);
+  color: #fff;
+  font-weight: 700;
+  padding: 0.85rem 1.9rem;
+  border-radius: 999px;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.fm-cta:hover { background: var(--fm-green-dark); }
+.fm-cta.fm-cta-outline { background: transparent; color: var(--fm-green-dark); border: 1px solid var(--fm-green); }
+.fm-cta.fm-cta-outline:hover { background: rgba(31, 138, 76, 0.08); }
+
+.fm-cards-row {
+  max-width: 74rem;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  padding: 2.5rem 1.5rem;
+}
+
+.fm-mini-card {
+  border: 1px solid var(--fm-line);
+  border-radius: 0.6rem;
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  background: var(--fm-white);
+}
+
+.fm-mini-card h3 { font-size: 1.05rem; margin: 0 0 0.6rem; }
+.fm-mini-card a { color: var(--fm-green-dark); font-size: 0.85rem; text-decoration: underline; font-weight: 600; }
+
+.fm-section { padding: 2.5rem 1.5rem; max-width: 74rem; margin: 0 auto; width: 100%; }
+.fm-section h2 { text-align: center; margin-bottom: 1.75rem; font-size: 1.5rem; }
+
+.fm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.1rem;
+}
+
+.fm-card {
+  background: var(--fm-white);
+  border-radius: 0.6rem;
+  padding: 1.4rem;
+  border: 1px solid var(--fm-line);
+  box-shadow: 0 4px 14px rgba(22, 36, 26, 0.04);
+}
+
+.fm-card h3 { margin: 0 0 0.4rem; color: var(--fm-ink); font-weight: 700; }
+.fm-card p { margin: 0; color: var(--fm-gray); line-height: 1.45; font-size: 0.92rem; }
+
+.fm-footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 2rem 1rem;
+  background: var(--fm-ink);
+  color: var(--fm-bg);
+}
+
+.fm-powered { opacity: 0.6; font-size: 0.8rem; margin-top: 0.25rem; }
+
+/* --- Agenda interactiva (/agenda/:slug) --- */
+
+.fm-hero-compact { padding: 2rem 1.5rem 1.5rem; }
+
+.fm-field-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--fm-ink);
+  margin: 0 auto 0.6rem;
+  max-width: 30rem;
+  text-align: left;
+}
+
+.fm-input {
+  display: block;
+  width: 100%;
+  max-width: 30rem;
+  margin: 0 auto 1.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--fm-line);
+  border-radius: 0.5rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: var(--fm-white);
+}
+
+.fm-servicio-card {
+  background: var(--fm-white);
+  border: 1px solid var(--fm-line);
+  border-radius: 0.6rem;
+  padding: 1.1rem;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+}
+
+.fm-servicio-card h3 { margin: 0 0 0.3rem; font-size: 1.02rem; font-weight: 700; }
+.fm-servicio-card p { margin: 0; font-size: 0.85rem; color: var(--fm-gray); }
+
+.fm-servicio-card-activa { border-color: var(--fm-green); border-width: 2px; background: rgba(31, 138, 76, 0.05); }
+
+.fm-agenda-grid {
+  max-width: 34rem;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.6rem;
+}
+
+.fm-slot {
+  background: var(--fm-white);
+  border: 1px solid var(--fm-line);
+  border-radius: 0.4rem;
+  padding: 0.6rem 0.4rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: center;
+  font-family: inherit;
+}
+
+.fm-slot-activo { background: var(--fm-green); color: #fff; border-color: var(--fm-green); font-weight: 700; }
+
+.fm-agenda-bar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem 1.25rem 1.75rem;
+  background: linear-gradient(180deg, rgba(244,249,244,0) 0%, var(--fm-bg) 35%);
+}
+
+.fm-cta:disabled { background: var(--fm-line); color: var(--fm-gray); cursor: not-allowed; }
+
+@media (max-width: 860px) {
+  .fm-cards-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .fm-hero { padding: 2.5rem 1.25rem; }
+  .fm-section { padding: 2.25rem 1.25rem; }
+  .fm-cta { width: 100%; text-align: center; }
+  .fm-hero-actions { flex-direction: column; }
+}

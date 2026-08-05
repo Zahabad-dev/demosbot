@@ -111,6 +111,8 @@ export default function NegocioEditor() {
             <option value="mecanico">Mecánico (taller automotriz)</option>
             <option value="gimnasio">Gimnasio</option>
             <option value="barberia">Barbería (masculina)</option>
+            <option value="fumigacion">Fumigación / control de plagas</option>
+            <option value="sanitizacion">Sanitización / desinfección</option>
           </select>
         </div>
         <div className="field">

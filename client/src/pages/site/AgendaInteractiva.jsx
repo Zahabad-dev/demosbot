@@ -7,6 +7,8 @@ import '../../styles/medicina.css';
 import '../../styles/mecanico.css';
 import '../../styles/gimnasio.css';
 import '../../styles/barberia.css';
+import '../../styles/fumigacion.css';
+import '../../styles/sanitizacion.css';
 import { colorOverrideStyle } from '../../lib/plantillaColores';
 
 const WHATSAPP_FALLBACK = '5217751667681';
@@ -82,6 +84,32 @@ const SKINS = {
       { pregunta: 'Corte clásico', respuesta: 'Corte a tijera y máquina, incluye lavado. — $150 · 30 min' },
       { pregunta: 'Corte + barba', respuesta: 'Corte completo más arreglo de barba con navaja. — $220 · 45 min' },
       { pregunta: 'Afeitado tradicional', respuesta: 'Toalla caliente, navaja y loción. — $130 · 25 min' },
+    ],
+  },
+  fumigacion: {
+    prefix: 'fm',
+    nombreDemo: 'FumiGuard',
+    tagline: 'AGENDA TU FUMIGACIÓN',
+    tituloPaso2: '2. Elige el servicio',
+    ctaTexto: 'Agendar por WhatsApp',
+    conImagen: false,
+    demoServicios: [
+      { pregunta: 'Fumigación residencial', respuesta: 'Control de cucarachas, hormigas y arañas. Casa hasta 120 m². — $650 · 1 hr' },
+      { pregunta: 'Control de plagas comercial', respuesta: 'Para restaurantes, oficinas y locales. — $1,200 · 2 hrs' },
+      { pregunta: 'Fumigación de jardín', respuesta: 'Control de mosquitos y plagas de exterior. — $500 · 45 min' },
+    ],
+  },
+  sanitizacion: {
+    prefix: 'sn',
+    nombreDemo: 'Desinfecta TX',
+    tagline: 'AGENDA TU SANITIZACIÓN',
+    tituloPaso2: '2. Elige el servicio',
+    ctaTexto: 'Agendar por WhatsApp',
+    conImagen: false,
+    demoServicios: [
+      { pregunta: 'Sanitización de espacios', respuesta: 'Desinfección con nebulizado grado hospitalario. Hasta 100 m². — $700 · 1 hr' },
+      { pregunta: 'Sanitización de vehículos', respuesta: 'Interior de auto, camioneta o unidad de transporte. — $350 · 30 min' },
+      { pregunta: 'Sanitización de oficinas', respuesta: 'Áreas comunes, escritorios y superficies de contacto. — $1,100 · 2 hrs' },
     ],
   },
 };

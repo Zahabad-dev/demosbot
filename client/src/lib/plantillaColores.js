@@ -12,6 +12,8 @@ const VARS_POR_PLANTILLA = {
   mecanico: { primario: '--mc-orange', acento: '--mc-orange-dark' },
   gimnasio: { primario: '--gm-lime', acento: '--gm-lime-dark' },
   barberia: { primario: '--bb-burgundy', acento: '--bb-green' },
+  fumigacion: { primario: '--fm-green', acento: '--fm-green-dark' },
+  sanitizacion: { primario: '--sn-blue', acento: '--sn-cyan' },
 };
 
 export function colorOverrideStyle(negocio) {

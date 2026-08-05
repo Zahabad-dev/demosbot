@@ -9,6 +9,8 @@ import PlantillaMedicina from './templates/PlantillaMedicina';
 import PlantillaMecanico from './templates/PlantillaMecanico';
 import PlantillaGimnasio from './templates/PlantillaGimnasio';
 import PlantillaBarberia from './templates/PlantillaBarberia';
+import PlantillaFumigacion from './templates/PlantillaFumigacion';
+import PlantillaSanitizacion from './templates/PlantillaSanitizacion';
 import { colorOverrideStyle } from '../../lib/plantillaColores';
 
 const PLANTILLAS = {
@@ -21,6 +23,8 @@ const PLANTILLAS = {
   mecanico: PlantillaMecanico,
   gimnasio: PlantillaGimnasio,
   barberia: PlantillaBarberia,
+  fumigacion: PlantillaFumigacion,
+  sanitizacion: PlantillaSanitizacion,
 };
 
 export default function Home() {
