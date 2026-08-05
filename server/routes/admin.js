@@ -174,12 +174,28 @@ adminRouter.get('/negocios/:negocioId/faq', requireAuth, scopeNegocio, async (re
   res.json(rows);
 });
 
+// Limite de servicios/productos "estrella" por negocio — cualquier fila de FAQ que NO sea
+// categoria 'general' cuenta como catalogo (servicios, entradas, fuertes, bebidas, postres,
+// vehiculos, etc., segun la plantilla). La info general (horarios, ubicacion, financiamiento...)
+// queda sin limite. Aplica igual para agencia y cliente, es un limite de producto, no de rol.
+const LIMITE_SERVICIOS_ESTRELLA = 15;
+
 adminRouter.post('/negocios/:negocioId/faq', requireAuth, scopeNegocio, async (req, res) => {
   const { categoria, pregunta, respuesta, orden, imagen_url } = req.body;
+  const categoriaFinal = categoria || 'general';
+  if (categoriaFinal !== 'general') {
+    const { rows: countRows } = await query(
+      "SELECT COUNT(*) FROM faq WHERE negocio_id = $1 AND categoria <> 'general'",
+      [req.params.negocioId]
+    );
+    if (Number(countRows[0].count) >= LIMITE_SERVICIOS_ESTRELLA) {
+      return res.status(400).json({ error: `Límite de ${LIMITE_SERVICIOS_ESTRELLA} servicios/productos estrella alcanzado. Borra alguno para agregar otro.` });
+    }
+  }
   const { rows } = await query(
     `INSERT INTO faq (negocio_id, categoria, pregunta, respuesta, orden, imagen_url)
      VALUES ($1,$2,$3,$4,$5,$6) RETURNING *`,
-    [req.params.negocioId, categoria || 'general', pregunta, respuesta, orden || 0, imagen_url || null]
+    [req.params.negocioId, categoriaFinal, pregunta, respuesta, orden || 0, imagen_url || null]
   );
   res.status(201).json(rows[0]);
 });

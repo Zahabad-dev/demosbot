@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { api } from '../../lib/apiClient';
 
 const empty = { categoria: 'general', pregunta: '', respuesta: '', orden: 0, imagen_url: '' };
+const LIMITE_SERVICIOS_ESTRELLA = 15;
 
 export default function FaqManager() {
   const { negocioId } = useParams();
@@ -40,12 +41,19 @@ export default function FaqManager() {
     }
   };
 
+  const totalEstrella = items.filter((it) => it.categoria !== 'general').length;
+  const alLimite = totalEstrella >= LIMITE_SERVICIOS_ESTRELLA;
+
   return (
     <div>
       <h1>Preguntas frecuentes (FAQ)</h1>
       <p style={{ color: '#9aa1ad' }}>
         El agente de IA solo responde con lo que está aquí. Para cambiar el negocio de giro
-        (ej. de tacos a azulejos) basta con reemplazar estas filas.
+        (ej. de tacos a azulejos) basta con reemplazar estas filas. Las filas con categoría
+        "general" (horarios, ubicación, etc.) no tienen límite — los servicios/productos
+        (cualquier otra categoría, ej. "servicios", "entradas") tienen un máximo de{' '}
+        <strong>{LIMITE_SERVICIOS_ESTRELLA}</strong> por negocio: llevas{' '}
+        <strong>{totalEstrella}/{LIMITE_SERVICIOS_ESTRELLA}</strong>.
       </p>
 
       {items.map((item) => (
@@ -85,7 +93,10 @@ export default function FaqManager() {
           placeholder="URL de imagen (opcional, ej. para ítems de menú)"
         />
         {error && <p className="error-msg">{error}</p>}
-        <button type="submit">Agregar</button>
+        {alLimite && nuevo.categoria !== 'general' && (
+          <p className="error-msg">Ya llegaste al límite de {LIMITE_SERVICIOS_ESTRELLA} servicios/productos. Borra alguno o usa categoría "general" para info que no es catálogo.</p>
+        )}
+        <button type="submit" disabled={alLimite && nuevo.categoria !== 'general'}>Agregar</button>
       </form>
     </div>
   );
