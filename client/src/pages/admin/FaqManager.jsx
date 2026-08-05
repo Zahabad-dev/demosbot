@@ -5,15 +5,52 @@ import { api } from '../../lib/apiClient';
 const empty = { categoria: 'general', pregunta: '', respuesta: '', orden: 0, imagen_url: '' };
 const LIMITE_SERVICIOS_ESTRELLA = 15;
 
+// Categorías válidas por tipo_funcion — deben coincidir EXACTO con lo que cada plantilla del
+// sitio público filtra (ej. `categoria === 'servicios'` en AgendaInteractiva.jsx/MenuInteractivo.jsx),
+// por eso ahora es un desplegable y no texto libre: un typo aquí (ej. "servicio" sin la s) hace
+// que el item exista en la BD pero nunca se muestre en el sitio ni al bot.
+const CATEGORIAS_POR_TIPO = {
+  citas: [
+    { value: 'general', label: 'General (horarios, políticas, info...)' },
+    { value: 'servicios', label: 'Servicios/productos (catálogo, cuenta para el límite de 15)' },
+  ],
+  pedidos: [
+    { value: 'general', label: 'General (horarios, políticas, info...)' },
+    { value: 'entradas', label: 'Entradas' },
+    { value: 'fuertes', label: 'Platos fuertes' },
+    { value: 'bebidas', label: 'Bebidas y bar' },
+    { value: 'postres', label: 'Postres' },
+  ],
+  ninguna: [
+    { value: 'general', label: 'General (horarios, políticas, info...)' },
+    { value: 'menu', label: 'Menú' },
+    { value: 'precios', label: 'Precios' },
+  ],
+};
+
+// Si el valor actual no está en la lista oficial (ej. quedó de un typo viejo o de otra
+// plantilla), lo agrega como opción aparte para que no desaparezca del selector — así el
+// usuario puede verlo y corregirlo eligiendo la categoría correcta de la lista.
+function opcionesCon(valorActual, base) {
+  if (valorActual && !base.some((o) => o.value === valorActual)) {
+    return [...base, { value: valorActual, label: `${valorActual} (no reconocida — corrígela)` }];
+  }
+  return base;
+}
+
 export default function FaqManager() {
   const { negocioId } = useParams();
   const [items, setItems] = useState([]);
+  const [negocio, setNegocio] = useState(null);
   const [nuevo, setNuevo] = useState(empty);
   const [error, setError] = useState('');
 
   const load = () => api.get(`/admin/negocios/${negocioId}/faq`).then(setItems).catch((e) => setError(e.message));
 
   useEffect(() => { load(); }, [negocioId]);
+  useEffect(() => { api.get(`/admin/negocios/${negocioId}`).then(setNegocio).catch(() => {}); }, [negocioId]);
+
+  const categorias = CATEGORIAS_POR_TIPO[negocio?.tipo_funcion] || CATEGORIAS_POR_TIPO.ninguna;
 
   const onChange = (id, field, value) => {
     setItems((prev) => prev.map((it) => (it.id === id ? { ...it, [field]: value } : it)));
@@ -58,7 +95,11 @@ export default function FaqManager() {
 
       {items.map((item) => (
         <div className="faq-row" key={item.id}>
-          <input value={item.categoria} onChange={(e) => onChange(item.id, 'categoria', e.target.value)} placeholder="categoría" />
+          <select value={item.categoria} onChange={(e) => onChange(item.id, 'categoria', e.target.value)}>
+            {opcionesCon(item.categoria, categorias).map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
           <input value={item.pregunta} onChange={(e) => onChange(item.id, 'pregunta', e.target.value)} placeholder="pregunta" />
           <textarea value={item.respuesta} onChange={(e) => onChange(item.id, 'respuesta', e.target.value)} rows={3} />
           <input
@@ -84,7 +125,11 @@ export default function FaqManager() {
 
       <h2 style={{ marginTop: '2rem' }}>Agregar nueva</h2>
       <form onSubmit={onCreate} className="faq-row">
-        <input value={nuevo.categoria} onChange={(e) => setNuevo({ ...nuevo, categoria: e.target.value })} placeholder="categoría" />
+        <select value={nuevo.categoria} onChange={(e) => setNuevo({ ...nuevo, categoria: e.target.value })}>
+          {categorias.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
         <input value={nuevo.pregunta} onChange={(e) => setNuevo({ ...nuevo, pregunta: e.target.value })} placeholder="pregunta" required />
         <textarea value={nuevo.respuesta} onChange={(e) => setNuevo({ ...nuevo, respuesta: e.target.value })} placeholder="respuesta" rows={3} required />
         <input
