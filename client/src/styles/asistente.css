@@ -1,0 +1,256 @@
+/* Plantilla Asistente Profesional — "secretaria virtual" adaptable a abogados, contadores,
+   consultores y profesionistas en general (no un giro fijo, por eso el diseño es neutral).
+   Grafito + azul acero, tipografia Work Sans (limpia, corporativa, legible). El cliente debe
+   alimentar mucho su FAQ para que el bot responda genérico a sus propios clientes/pacientes. */
+
+:root {
+  --ap-graphite: #2b2f36;
+  --ap-graphite-dark: #1c1f24;
+  --ap-blue: #4f7cac;
+  --ap-blue-dark: #3a5f87;
+  --ap-bg: #f5f6f7;
+  --ap-ink: #22262c;
+  --ap-gray: #626a73;
+  --ap-line: #dfe2e6;
+}
+
+.ap-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Work Sans', 'Segoe UI', system-ui, sans-serif;
+  background: var(--ap-bg);
+  color: var(--ap-ink);
+}
+
+.ap-page h1, .ap-page h2, .ap-page h3 { font-family: 'Work Sans', sans-serif; font-weight: 700; }
+
+.ap-hero {
+  background: var(--ap-graphite);
+  color: #fff;
+  text-align: center;
+  padding: 3.5rem 1.5rem 3rem;
+}
+
+.ap-logo {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  border-radius: 999px;
+  background: #fff;
+  padding: 0.5rem;
+  margin: 0 auto 1.25rem;
+  display: block;
+}
+
+.ap-badge {
+  display: inline-block;
+  background: rgba(79, 124, 172, 0.22);
+  color: #a9c4de;
+  padding: 0.3rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+}
+
+.ap-hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); margin: 0.2rem 0; }
+
+.ap-tagline {
+  color: var(--ap-blue);
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-size: clamp(0.7rem, 2vw, 0.85rem);
+  margin: 0.5rem 0 1.25rem;
+  text-transform: uppercase;
+}
+
+.ap-sub { max-width: 30rem; margin: 0 auto; color: #cdd2d8; }
+.ap-hint { margin-top: 1rem; font-size: 0.8rem; color: #a7adb5; }
+
+.ap-hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1.5rem; }
+
+.ap-qr-section {
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  background: var(--ap-bg);
+}
+
+.ap-qr-card {
+  background: #fff;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  text-align: center;
+  max-width: 22rem;
+  border: 1px solid var(--ap-line);
+}
+
+.ap-qr-img { width: 100%; max-width: 200px; border-radius: 0.3rem; }
+.ap-qr-caption { font-size: 0.8rem; color: var(--ap-gray); margin-top: 0.9rem; }
+
+.ap-qr-download {
+  display: inline-block;
+  margin-top: 0.9rem;
+  color: var(--ap-blue-dark);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: underline;
+}
+
+.ap-cta {
+  display: inline-block;
+  background: var(--ap-blue);
+  color: #fff;
+  font-weight: 700;
+  padding: 0.85rem 1.9rem;
+  border-radius: 0.4rem;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.ap-cta:hover { background: var(--ap-blue-dark); }
+.ap-cta.ap-cta-outline { background: transparent; color: #fff; border: 1px solid var(--ap-blue); }
+.ap-cta.ap-cta-outline:hover { background: rgba(79, 124, 172, 0.15); }
+
+.ap-cards-row {
+  max-width: 74rem;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  padding: 2.5rem 1.5rem;
+}
+
+.ap-mini-card {
+  border: 1px solid var(--ap-line);
+  border-radius: 0.5rem;
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  background: #fff;
+}
+
+.ap-mini-card h3 { font-size: 1.05rem; margin: 0 0 0.6rem; }
+.ap-mini-card a { color: var(--ap-blue-dark); font-size: 0.85rem; text-decoration: underline; font-weight: 600; }
+
+.ap-section { padding: 2.5rem 1.5rem; max-width: 74rem; margin: 0 auto; width: 100%; }
+.ap-section h2 { text-align: center; margin-bottom: 1.75rem; font-size: 1.5rem; }
+
+.ap-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.1rem;
+}
+
+.ap-card {
+  background: #fff;
+  border-radius: 0.5rem;
+  padding: 1.4rem;
+  border: 1px solid var(--ap-line);
+  box-shadow: 0 4px 14px rgba(34, 38, 44, 0.05);
+}
+
+.ap-card h3 { margin: 0 0 0.4rem; color: var(--ap-ink); font-weight: 700; }
+.ap-card p { margin: 0; color: var(--ap-gray); line-height: 1.45; font-size: 0.92rem; }
+
+.ap-footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 2rem 1rem;
+  background: var(--ap-graphite-dark);
+  color: #a7adb5;
+}
+
+.ap-powered { opacity: 0.7; font-size: 0.8rem; margin-top: 0.25rem; }
+
+/* --- Agenda interactiva (/agenda/:slug) --- */
+
+.ap-hero-compact { padding: 2rem 1.5rem 1.5rem; }
+
+.ap-field-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ap-ink);
+  margin: 0 auto 0.6rem;
+  max-width: 30rem;
+  text-align: left;
+}
+
+.ap-input {
+  display: block;
+  width: 100%;
+  max-width: 30rem;
+  margin: 0 auto 1.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--ap-line);
+  border-radius: 0.4rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: #fff;
+}
+
+.ap-servicio-card {
+  background: #fff;
+  border: 1px solid var(--ap-line);
+  border-radius: 0.5rem;
+  padding: 1.1rem;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+}
+
+.ap-servicio-card h3 { margin: 0 0 0.3rem; font-size: 1.02rem; font-weight: 700; }
+.ap-servicio-card p { margin: 0; font-size: 0.85rem; color: var(--ap-gray); }
+
+.ap-servicio-card-activa { border-color: var(--ap-blue); border-width: 2px; background: rgba(79, 124, 172, 0.06); }
+
+.ap-agenda-grid {
+  max-width: 34rem;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.6rem;
+}
+
+.ap-slot {
+  background: #fff;
+  border: 1px solid var(--ap-line);
+  border-radius: 0.4rem;
+  padding: 0.6rem 0.4rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: center;
+  font-family: inherit;
+}
+
+.ap-slot-activo { background: var(--ap-graphite); color: #fff; border-color: var(--ap-graphite); font-weight: 700; }
+
+.ap-agenda-bar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem 1.25rem 1.75rem;
+  background: linear-gradient(180deg, rgba(245,246,247,0) 0%, var(--ap-bg) 35%);
+}
+
+.ap-cta:disabled { background: var(--ap-line); color: var(--ap-gray); cursor: not-allowed; }
+
+@media (max-width: 860px) {
+  .ap-cards-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .ap-hero { padding: 2.5rem 1.25rem; }
+  .ap-section { padding: 2.25rem 1.25rem; }
+  .ap-cta { width: 100%; text-align: center; }
+  .ap-hero-actions { flex-direction: column; }
+}

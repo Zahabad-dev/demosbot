@@ -11,6 +11,8 @@ import PlantillaGimnasio from './templates/PlantillaGimnasio';
 import PlantillaBarberia from './templates/PlantillaBarberia';
 import PlantillaFumigacion from './templates/PlantillaFumigacion';
 import PlantillaSanitizacion from './templates/PlantillaSanitizacion';
+import PlantillaSeguros from './templates/PlantillaSeguros';
+import PlantillaAsistente from './templates/PlantillaAsistente';
 import ServicioSuspendido from './ServicioSuspendido';
 import { colorOverrideStyle } from '../../lib/plantillaColores';
 
@@ -26,6 +28,8 @@ const PLANTILLAS = {
   barberia: PlantillaBarberia,
   fumigacion: PlantillaFumigacion,
   sanitizacion: PlantillaSanitizacion,
+  seguros: PlantillaSeguros,
+  asistente: PlantillaAsistente,
 };
 
 export default function Home() {

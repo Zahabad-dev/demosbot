@@ -14,6 +14,8 @@ const VARS_POR_PLANTILLA = {
   barberia: { primario: '--bb-burgundy', acento: '--bb-green' },
   fumigacion: { primario: '--fm-green', acento: '--fm-green-dark' },
   sanitizacion: { primario: '--sn-blue', acento: '--sn-cyan' },
+  seguros: { primario: '--sg-navy', acento: '--sg-gold' },
+  asistente: { primario: '--ap-graphite', acento: '--ap-blue' },
 };
 
 export function colorOverrideStyle(negocio) {

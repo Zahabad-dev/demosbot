@@ -9,6 +9,8 @@ import '../../styles/gimnasio.css';
 import '../../styles/barberia.css';
 import '../../styles/fumigacion.css';
 import '../../styles/sanitizacion.css';
+import '../../styles/seguros.css';
+import '../../styles/asistente.css';
 import ServicioSuspendido from './ServicioSuspendido';
 import { colorOverrideStyle } from '../../lib/plantillaColores';
 
@@ -111,6 +113,32 @@ const SKINS = {
       { pregunta: 'Sanitización de espacios', respuesta: 'Desinfección con nebulizado grado hospitalario. Hasta 100 m². — $700 · 1 hr' },
       { pregunta: 'Sanitización de vehículos', respuesta: 'Interior de auto, camioneta o unidad de transporte. — $350 · 30 min' },
       { pregunta: 'Sanitización de oficinas', respuesta: 'Áreas comunes, escritorios y superficies de contacto. — $1,100 · 2 hrs' },
+    ],
+  },
+  seguros: {
+    prefix: 'sg',
+    nombreDemo: 'Escudo Seguros',
+    tagline: 'AGENDA TU ASESORÍA',
+    tituloPaso2: '2. Elige el tipo de asesoría',
+    ctaTexto: 'Agendar por WhatsApp',
+    conImagen: false,
+    demoServicios: [
+      { pregunta: 'Seguro de auto', respuesta: 'Cotización y comparación de coberturas. — Asesoría sin costo · 30 min' },
+      { pregunta: 'Seguro de gastos médicos', respuesta: 'Plan individual o familiar, según tu presupuesto. — Asesoría sin costo · 40 min' },
+      { pregunta: 'Seguro de vida', respuesta: 'Protección para tu familia, con o sin ahorro. — Asesoría sin costo · 30 min' },
+    ],
+  },
+  asistente: {
+    prefix: 'ap',
+    nombreDemo: 'Bufete Torres Legal',
+    tagline: 'AGENDA TU CITA',
+    tituloPaso2: '2. Elige el servicio',
+    ctaTexto: 'Agendar por WhatsApp',
+    conImagen: false,
+    demoServicios: [
+      { pregunta: 'Consulta inicial', respuesta: 'Valoración de tu caso y siguientes pasos. — $500 · 30 min' },
+      { pregunta: 'Asesoría de seguimiento', respuesta: 'Para clientes con un trámite ya en curso. — $350 · 20 min' },
+      { pregunta: 'Revisión de documentos', respuesta: 'Revisión de contratos u otros documentos. — $600 · 40 min' },
     ],
   },
 };
