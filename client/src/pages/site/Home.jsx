@@ -11,6 +11,7 @@ import PlantillaGimnasio from './templates/PlantillaGimnasio';
 import PlantillaBarberia from './templates/PlantillaBarberia';
 import PlantillaFumigacion from './templates/PlantillaFumigacion';
 import PlantillaSanitizacion from './templates/PlantillaSanitizacion';
+import ServicioSuspendido from './ServicioSuspendido';
 import { colorOverrideStyle } from '../../lib/plantillaColores';
 
 const PLANTILLAS = {
@@ -43,6 +44,8 @@ export default function Home() {
       })
       .catch(() => setError(true));
   }, []);
+
+  if (negocio?.suspendido) return <ServicioSuspendido negocio={negocio} />;
 
   const Plantilla = PLANTILLAS[negocio?.plantilla] || PlantillaGenerica;
   return (

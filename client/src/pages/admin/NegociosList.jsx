@@ -11,6 +11,7 @@ export default function NegociosList() {
   const [negocios, setNegocios] = useState([]);
   const [activandoId, setActivandoId] = useState(null);
   const [activandoClienteId, setActivandoClienteId] = useState(null);
+  const [suspendiendoId, setSuspendiendoId] = useState(null);
   const [nuevo, setNuevo] = useState(emptyNegocio);
   const [error, setError] = useState('');
 
@@ -50,6 +51,24 @@ export default function NegociosList() {
     }
   };
 
+  // Pausa/reanuda el servicio de un cliente real sin borrar ni tocar nada de su configuracion
+  // (sitio muestra aviso de "pausado" y el bot deja de responder) — pensado para clientes que
+  // dejaron de pagar, reversible con el mismo boton.
+  const onToggleSuspender = async (n) => {
+    const accion = n.suspendido ? 'reanudar' : 'suspender';
+    if (!window.confirm(`¿Seguro que quieres ${accion} el servicio de ${n.nombre}?`)) return;
+    setSuspendiendoId(n.id);
+    setError('');
+    try {
+      await api.put(`/admin/negocios/${n.id}/suspender`, { suspendido: !n.suspendido });
+      await load();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSuspendiendoId(null);
+    }
+  };
+
   const onCreate = async (e) => {
     e.preventDefault();
     setError('');
@@ -77,6 +96,7 @@ export default function NegociosList() {
           <strong>
             {n.nombre} {n.activo && <span className="badge-activo">Activo</span>}
             {!n.es_demo && <span className="badge-atencion">Cliente{n.dominio ? ` · ${n.dominio}` : ''}</span>}
+            {n.suspendido && <span className="badge-atencion" style={{ background: '#7a2e2e' }}>Suspendido</span>}
           </strong>
           <span style={{ color: '#9aa1ad' }}>{n.giro} · {n.ciudad}</span>
           <div className="faq-row-actions">
@@ -96,6 +116,15 @@ export default function NegociosList() {
                 disabled={activandoClienteId === n.id}
               >
                 {activandoClienteId === n.id ? 'Activando…' : 'Activar Cliente'}
+              </button>
+            )}
+            {isAgencia && !n.es_demo && (
+              <button
+                className={n.suspendido ? 'secondary' : 'danger'}
+                onClick={() => onToggleSuspender(n)}
+                disabled={suspendiendoId === n.id}
+              >
+                {suspendiendoId === n.id ? 'Guardando…' : n.suspendido ? 'Reanudar servicio' : 'Suspender servicio'}
               </button>
             )}
             {isAgencia && <Link to={`/admin/negocios/${n.id}`}><button className="secondary">Editar bot</button></Link>}

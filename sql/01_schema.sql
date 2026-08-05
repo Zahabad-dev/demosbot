@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS negocios (
   logo_data_url  TEXT,                                 -- logo del negocio como data URL base64 (editable desde el panel)
   activo         BOOLEAN DEFAULT true,
   es_demo        BOOLEAN NOT NULL DEFAULT true,         -- false = cliente real activado (paga), ya no compite por el switch de demos
+  suspendido     BOOLEAN NOT NULL DEFAULT false,        -- true = servicio pausado (ej. cliente real que no pago) sin borrar nada, reversible con un toggle
   dominio        VARCHAR(255) UNIQUE,                   -- dominio propio del cliente (ej. www.sunegocio.com), NULL = usa el dominio compartido de demos
   dominio_vence  DATE,                                  -- fecha de renovacion del dominio, para que la agencia no la pierda de vista
   color_primario VARCHAR(7),                            -- hex, override de marca del cliente sobre la plantilla (NULL = usa el color por defecto de la plantilla)
@@ -33,6 +34,7 @@ ALTER TABLE negocios ADD COLUMN IF NOT EXISTS dominio VARCHAR(255) UNIQUE;
 ALTER TABLE negocios ADD COLUMN IF NOT EXISTS dominio_vence DATE;
 ALTER TABLE negocios ADD COLUMN IF NOT EXISTS color_primario VARCHAR(7);
 ALTER TABLE negocios ADD COLUMN IF NOT EXISTS color_acento VARCHAR(7);
+ALTER TABLE negocios ADD COLUMN IF NOT EXISTS suspendido BOOLEAN NOT NULL DEFAULT false;
 
 CREATE TABLE IF NOT EXISTS faq (
   id             SERIAL PRIMARY KEY,

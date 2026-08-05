@@ -9,6 +9,7 @@ import '../../styles/gimnasio.css';
 import '../../styles/barberia.css';
 import '../../styles/fumigacion.css';
 import '../../styles/sanitizacion.css';
+import ServicioSuspendido from './ServicioSuspendido';
 import { colorOverrideStyle } from '../../lib/plantillaColores';
 
 const WHATSAPP_FALLBACK = '5217751667681';
@@ -151,6 +152,8 @@ export default function AgendaInteractiva() {
       })
       .catch(() => setError(true));
   }, [slug]);
+
+  if (negocio?.suspendido) return <ServicioSuspendido negocio={negocio} />;
 
   const skin = SKINS[negocio?.plantilla] || SKIN_DEFAULT;
   const { prefix: px, tagline, tituloPaso2, ctaTexto, conImagen, iconoPlaceholder, demoServicios } = skin;

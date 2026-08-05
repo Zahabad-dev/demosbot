@@ -8,7 +8,7 @@ export const publicRouter = Router();
 // funcionando aunque el negocio deje de ser el activo del switch.
 publicRouter.get('/negocio/:slug', async (req, res) => {
   const { rows } = await query(
-    `SELECT slug, nombre, giro, ciudad, tono, whatsapp_numero, plantilla, logo_data_url, es_demo, color_primario, color_acento
+    `SELECT slug, nombre, giro, ciudad, tono, whatsapp_numero, plantilla, logo_data_url, es_demo, color_primario, color_acento, suspendido
      FROM negocios WHERE slug = $1`,
     [req.params.slug]
   );
@@ -16,7 +16,7 @@ publicRouter.get('/negocio/:slug', async (req, res) => {
   res.json(rows[0]);
 });
 
-const NEGOCIO_PUBLICO_COLS = 'id, slug, nombre, giro, ciudad, tono, whatsapp_numero, plantilla, logo_data_url, es_demo, color_primario, color_acento';
+const NEGOCIO_PUBLICO_COLS = 'id, slug, nombre, giro, ciudad, tono, whatsapp_numero, plantilla, logo_data_url, es_demo, color_primario, color_acento, suspendido';
 
 // Resuelve que negocio mostrar: primero por dominio propio (clientes reales activados con
 // su propio dominio), y si el host no coincide con ninguno (ej. el dominio compartido de
@@ -77,9 +77,11 @@ publicRouter.get('/negocio/:slug/links', async (req, res) => {
 
 // --- Endpoints que consume el bot (n8n), agnósticos de giro ---
 // n8n identifica el negocio por chatwoot_inbox_id (viene en el payload del webhook de Chatwoot).
+// `suspendido = true` corta el bot igual que si no existiera el negocio — es el mismo toggle
+// que usa /admin/negocios/:id/suspender para "cerrar el servicio" sin borrar nada.
 publicRouter.get('/bot/negocio-por-inbox/:inboxId', async (req, res) => {
   const { rows } = await query(
-    'SELECT id, slug, nombre, giro, tono, system_prompt FROM negocios WHERE chatwoot_inbox_id = $1 AND activo = true',
+    'SELECT id, slug, nombre, giro, tono, system_prompt FROM negocios WHERE chatwoot_inbox_id = $1 AND activo = true AND suspendido = false',
     [req.params.inboxId]
   );
   if (!rows[0]) return res.status(404).json({ error: 'Negocio no encontrado para ese inbox' });

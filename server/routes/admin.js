@@ -47,7 +47,7 @@ async function assertOwnsRow(req, res, tabla) {
 adminRouter.get('/negocios', requireAuth, async (req, res) => {
   const isAgencia = req.auth.rol === 'agencia';
   const { rows } = await query(
-    `SELECT n.id, n.slug, n.nombre, n.giro, n.ciudad, n.tono, n.activo, n.es_demo, n.dominio,
+    `SELECT n.id, n.slug, n.nombre, n.giro, n.ciudad, n.tono, n.activo, n.es_demo, n.dominio, n.suspendido,
        COALESCE(p.pendientes, 0) + COALESCE(c.pendientes, 0) + COALESCE(r.pendientes, 0) + COALESCE(s.pendientes, 0) AS pendientes
      FROM negocios n
      LEFT JOIN (SELECT negocio_id, COUNT(*) AS pendientes FROM pedidos WHERE estado = 'Nuevo' GROUP BY negocio_id) p ON p.negocio_id = n.id
@@ -153,6 +153,21 @@ adminRouter.post('/negocios/:negocioId/activar-cliente', requireAuth, requireAge
     if (err.code === '23505') return res.status(409).json({ error: 'Ese usuario/correo ya existe' });
     throw err;
   }
+});
+
+// Pausar/reanudar el servicio de un cliente real (ej. no pagó) SIN borrar ni tocar nada de su
+// configuracion/datos: mientras suspendido = true, el sitio de su dominio muestra un aviso de
+// "servicio pausado" (ver negocio.suspendido en el frontend) y el bot deja de responder en
+// Chatwoot (el endpoint /bot/negocio-por-inbox lo filtra). Reversible con el mismo toggle.
+adminRouter.put('/negocios/:negocioId/suspender', requireAuth, requireAgencia, async (req, res) => {
+  const { suspendido } = req.body;
+  if (typeof suspendido !== 'boolean') return res.status(400).json({ error: 'Falta el campo suspendido (booleano)' });
+  const { rows } = await query(
+    'UPDATE negocios SET suspendido = $2 WHERE id = $1 RETURNING *',
+    [req.params.negocioId, suspendido]
+  );
+  if (!rows[0]) return res.status(404).json({ error: 'No encontrado' });
+  res.json(rows[0]);
 });
 
 // Solo rol 'agencia' puede crear negocios nuevos (nuevos clientes/demos).
