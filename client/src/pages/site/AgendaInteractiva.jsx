@@ -3,29 +3,105 @@ import { useParams } from 'react-router-dom';
 import { api } from '../../lib/apiClient';
 import '../../styles/estetica-barberia.css';
 import '../../styles/garage.css';
+import '../../styles/medicina.css';
+import '../../styles/mecanico.css';
+import '../../styles/gimnasio.css';
+import '../../styles/barberia.css';
 import { colorOverrideStyle } from '../../lib/plantillaColores';
 
 const WHATSAPP_FALLBACK = '5217751667681';
 
-const SERVICIOS_DEMO_ESTETICA = [
-  { pregunta: 'Corte y peinado', respuesta: 'Corte a la medida + peinado con plancha o tenaza. — $250 · 45 min' },
-  { pregunta: 'Manicure spa', respuesta: 'Limado, cutícula, masaje y esmaltado. — $220 · 40 min' },
-  { pregunta: 'Pedicure spa', respuesta: 'Exfoliación, masaje y esmaltado. — $250 · 50 min' },
-  { pregunta: 'Facial hidratante', respuesta: 'Limpieza profunda + mascarilla hidratante. — $350 · 60 min' },
-  { pregunta: 'Depilación de cejas', respuesta: 'Diseño y depilación con cera o hilo. — $120 · 15 min' },
-  { pregunta: 'Maquillaje social', respuesta: 'Maquillaje para evento, incluye pestañas. — $450 · 60 min' },
-];
-
-// Mismo fallback que usa la plantilla Garage — se muestra si el negocio todavia no
-// tiene FAQ propia con categoria "servicios" (aqui cada "servicio" es un vehiculo).
-const SERVICIOS_DEMO_GARAGE = [
-  { pregunta: 'Sedán deportivo 2023', respuesta: 'Motor turbo, único dueño, 28,000 km. — $385,000' },
-  { pregunta: 'Camioneta 4x4 2022', respuesta: 'Doble cabina, 4x4, listo para carretera u off-road. — $520,000' },
-  { pregunta: 'SUV familiar 2023', respuesta: '7 pasajeros, cámara de reversa, garantía vigente. — $460,000' },
-];
-
 const DIAS = ['Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 const HORAS = ['10:00 am', '12:00 pm', '3:00 pm', '5:00 pm', '7:00 pm'];
+
+// Un solo componente de agenda sirve a todas las plantillas de tipo_funcion='citas' — lo
+// unico que cambia por plantilla es el "skin" (prefijo de clases CSS + copy de respaldo).
+// Agregar una plantilla nueva de citas = agregar una entrada aqui, no tocar la logica.
+const SKINS = {
+  garage: {
+    prefix: 'gr',
+    nombreDemo: 'Mr. Garage',
+    tagline: 'AGENDA TU PRUEBA DE MANEJO',
+    tituloPaso2: '2. Elige el auto',
+    ctaTexto: 'Agendar prueba por WhatsApp',
+    conImagen: true,
+    iconoPlaceholder: '🚗',
+    demoServicios: [
+      { pregunta: 'Sedán deportivo 2023', respuesta: 'Motor turbo, único dueño, 28,000 km. — $385,000' },
+      { pregunta: 'Camioneta 4x4 2022', respuesta: 'Doble cabina, 4x4, listo para carretera u off-road. — $520,000' },
+      { pregunta: 'SUV familiar 2023', respuesta: '7 pasajeros, cámara de reversa, garantía vigente. — $460,000' },
+    ],
+  },
+  medicina: {
+    prefix: 'md',
+    nombreDemo: 'Consultorio Demo',
+    tagline: 'AGENDA TU CITA',
+    tituloPaso2: '2. Elige el servicio',
+    ctaTexto: 'Agendar por WhatsApp',
+    conImagen: false,
+    demoServicios: [
+      { pregunta: 'Consulta general', respuesta: 'Valoración inicial y diagnóstico. — $450 · 30 min' },
+      { pregunta: 'Limpieza dental', respuesta: 'Limpieza profunda y revisión. — $600 · 45 min' },
+      { pregunta: 'Revisión de seguimiento', respuesta: 'Para pacientes en tratamiento. — $300 · 20 min' },
+    ],
+  },
+  mecanico: {
+    prefix: 'mc',
+    nombreDemo: 'Taller Demo',
+    tagline: 'AGENDA TU SERVICIO',
+    tituloPaso2: '2. Elige el servicio',
+    ctaTexto: 'Agendar por WhatsApp',
+    conImagen: false,
+    demoServicios: [
+      { pregunta: 'Cambio de aceite y filtro', respuesta: 'Incluye revisión de niveles. — $450 · 30 min' },
+      { pregunta: 'Afinación mayor', respuesta: 'Bujías, filtros, diagnóstico computarizado. — $1,800 · 2 hrs' },
+      { pregunta: 'Diagnóstico de falla', respuesta: 'Escaneo computarizado y reporte. — $350 · 40 min' },
+    ],
+  },
+  gimnasio: {
+    prefix: 'gm',
+    nombreDemo: 'Gimnasio Demo',
+    tagline: 'AGENDA TU CLASE',
+    tituloPaso2: '2. Elige la clase',
+    ctaTexto: 'Agendar por WhatsApp',
+    conImagen: false,
+    demoServicios: [
+      { pregunta: 'Clase de prueba gratis', respuesta: 'Conoce las instalaciones y entrena una vez sin costo. — $0 · 60 min' },
+      { pregunta: 'Funcional grupal', respuesta: 'Entrenamiento en grupo de alta intensidad. — $80 · 50 min' },
+      { pregunta: 'Sesión personalizada', respuesta: 'Uno a uno con entrenador certificado. — $250 · 60 min' },
+    ],
+  },
+  barberia: {
+    prefix: 'bb',
+    nombreDemo: 'Barbería Demo',
+    tagline: 'AGENDA TU CORTE',
+    tituloPaso2: '2. Elige el servicio',
+    ctaTexto: 'Agendar por WhatsApp',
+    conImagen: false,
+    demoServicios: [
+      { pregunta: 'Corte clásico', respuesta: 'Corte a tijera y máquina, incluye lavado. — $150 · 30 min' },
+      { pregunta: 'Corte + barba', respuesta: 'Corte completo más arreglo de barba con navaja. — $220 · 45 min' },
+      { pregunta: 'Afeitado tradicional', respuesta: 'Toalla caliente, navaja y loción. — $130 · 25 min' },
+    ],
+  },
+};
+
+const SKIN_DEFAULT = {
+  prefix: 'eb',
+  nombreDemo: 'Glow Studio',
+  tagline: 'AGENDA TU CITA',
+  tituloPaso2: '2. Elige tu servicio',
+  ctaTexto: 'Agendar por WhatsApp',
+  conImagen: false,
+  demoServicios: [
+    { pregunta: 'Corte y peinado', respuesta: 'Corte a la medida + peinado con plancha o tenaza. — $250 · 45 min' },
+    { pregunta: 'Manicure spa', respuesta: 'Limado, cutícula, masaje y esmaltado. — $220 · 40 min' },
+    { pregunta: 'Pedicure spa', respuesta: 'Exfoliación, masaje y esmaltado. — $250 · 50 min' },
+    { pregunta: 'Facial hidratante', respuesta: 'Limpieza profunda + mascarilla hidratante. — $350 · 60 min' },
+    { pregunta: 'Depilación de cejas', respuesta: 'Diseño y depilación con cera o hilo. — $120 · 15 min' },
+    { pregunta: 'Maquillaje social', respuesta: 'Maquillaje para evento, incluye pestañas. — $450 · 60 min' },
+  ],
+};
 
 export default function AgendaInteractiva() {
   const { slug } = useParams();
@@ -48,13 +124,11 @@ export default function AgendaInteractiva() {
       .catch(() => setError(true));
   }, [slug]);
 
-  const esGarage = negocio?.plantilla === 'garage';
-  const px = esGarage ? 'gr' : 'eb';
-  const SERVICIOS_DEMO = esGarage ? SERVICIOS_DEMO_GARAGE : SERVICIOS_DEMO_ESTETICA;
-  const tituloPaso2 = esGarage ? '2. Elige el auto' : '2. Elige tu servicio';
+  const skin = SKINS[negocio?.plantilla] || SKIN_DEFAULT;
+  const { prefix: px, tagline, tituloPaso2, ctaTexto, conImagen, iconoPlaceholder, demoServicios } = skin;
 
   const servicios = faq.filter((f) => f.categoria === 'servicios');
-  const serviciosMostrados = servicios.length > 0 ? servicios : SERVICIOS_DEMO;
+  const serviciosMostrados = servicios.length > 0 ? servicios : demoServicios;
 
   const whatsapp = negocio?.whatsapp_numero || WHATSAPP_FALLBACK;
   const listo = nombreCliente.trim() && servicioSeleccionado && slotSeleccionado;
@@ -75,8 +149,8 @@ export default function AgendaInteractiva() {
     <div className={`${px}-page`} style={colorOverrideStyle(negocio)}>
       <header className={`${px}-hero ${px}-hero-compact`}>
         {negocio?.logo_data_url && <img src={negocio.logo_data_url} alt="" className={`${px}-logo`} />}
-        <h1>{negocio?.nombre || (esGarage ? 'Mr. Garage' : 'Glow Studio')}</h1>
-        <p className={`${px}-tagline`}>{esGarage ? 'AGENDA TU PRUEBA DE MANEJO' : 'AGENDA TU CITA'}</p>
+        <h1>{negocio?.nombre || skin.nombreDemo}</h1>
+        <p className={`${px}-tagline`}>{tagline}</p>
         {error && <p className={`${px}-hint`}>(Demo sin conexión a la base de datos — así se verá con datos reales.)</p>}
       </header>
 
@@ -100,12 +174,12 @@ export default function AgendaInteractiva() {
               className={`${px}-servicio-card ${servicioSeleccionado?.pregunta === item.pregunta ? `${px}-servicio-card-activa` : ''}`}
               onClick={() => setServicioSeleccionado(item)}
             >
-              {esGarage && (item.imagen_url ? (
-                <img src={item.imagen_url} alt={item.pregunta} className="gr-card-img" />
+              {conImagen && (item.imagen_url ? (
+                <img src={item.imagen_url} alt={item.pregunta} className={`${px}-card-img`} />
               ) : (
-                <div className="gr-card-img gr-card-img-placeholder">🚗</div>
+                <div className={`${px}-card-img ${px}-card-img-placeholder`}>{iconoPlaceholder}</div>
               ))}
-              <div className={esGarage ? 'gr-servicio-card-body' : ''}>
+              <div className={conImagen ? `${px}-servicio-card-body` : ''}>
                 <h3>{item.pregunta}</h3>
                 <p>{item.respuesta}</p>
               </div>
@@ -139,7 +213,7 @@ export default function AgendaInteractiva() {
 
       <div className={`${px}-agenda-bar`}>
         <button className={`${px}-cta`} onClick={agendarPorWhatsapp} disabled={!listo}>
-          {esGarage ? 'Agendar prueba por WhatsApp' : 'Agendar por WhatsApp'}
+          {ctaTexto}
         </button>
       </div>
 

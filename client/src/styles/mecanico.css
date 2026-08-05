@@ -1,0 +1,262 @@
+/* Plantilla Mecanico — taller automotriz/servicio (distinta de "Garage" que es venta de
+   autos). Industrial y utilitaria: gris acero + naranja de seguridad, tipografia Oswald
+   condensada, sin lujo ni photo hero — la sensacion es "taller confiable", no "showroom". */
+
+:root {
+  --mc-steel: #22262b;
+  --mc-steel-light: #2f343b;
+  --mc-orange: #ff6a00;
+  --mc-orange-dark: #cc5500;
+  --mc-white: #f0f0f0;
+  --mc-gray: #9aa0a6;
+  --mc-line: #3a3f46;
+}
+
+.mc-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+  background: var(--mc-steel);
+  color: var(--mc-white);
+}
+
+.mc-page h1, .mc-page h2, .mc-page h3 {
+  font-family: 'Oswald', 'Segoe UI', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.mc-hero {
+  background: var(--mc-steel);
+  text-align: center;
+  padding: 3.5rem 1.5rem 3rem;
+  border-bottom: 4px solid var(--mc-orange);
+}
+
+.mc-logo {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  border-radius: 0.4rem;
+  background: var(--mc-steel-light);
+  border: 2px solid var(--mc-orange);
+  padding: 0.5rem;
+  margin: 0 auto 1.25rem;
+  display: block;
+}
+
+.mc-badge {
+  display: inline-block;
+  background: var(--mc-orange);
+  color: var(--mc-steel);
+  padding: 0.3rem 1rem;
+  border-radius: 3px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 1.25rem;
+}
+
+.mc-hero h1 { font-size: clamp(2.4rem, 7vw, 3.8rem); margin: 0.2rem 0; letter-spacing: 1px; }
+
+.mc-tagline {
+  color: var(--mc-orange);
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
+  margin: 0.5rem 0 1.25rem;
+}
+
+.mc-sub { max-width: 30rem; margin: 0 auto; color: var(--mc-gray); font-family: 'Nunito', sans-serif; }
+.mc-hint { margin-top: 1rem; font-size: 0.8rem; color: var(--mc-gray); }
+
+.mc-hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1.5rem; }
+
+.mc-qr-section {
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  background: var(--mc-steel-light);
+}
+
+.mc-qr-card {
+  background: var(--mc-white);
+  border-radius: 0.4rem;
+  padding: 1.5rem;
+  text-align: center;
+  max-width: 22rem;
+}
+
+.mc-qr-img { width: 100%; max-width: 200px; }
+.mc-qr-caption { font-size: 0.8rem; color: #444; margin-top: 0.9rem; font-family: 'Nunito', sans-serif; }
+
+.mc-qr-download {
+  display: inline-block;
+  margin-top: 0.9rem;
+  background: var(--mc-steel);
+  color: var(--mc-orange);
+  border: 1px solid var(--mc-orange);
+  padding: 0.5rem 1.2rem;
+  border-radius: 3px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.mc-cta {
+  display: inline-block;
+  background: var(--mc-orange);
+  color: var(--mc-steel);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.85rem 1.9rem;
+  border-radius: 3px;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.95rem;
+}
+
+.mc-cta:hover { background: var(--mc-orange-dark); }
+.mc-cta.mc-cta-outline { background: transparent; color: var(--mc-white); border: 1px solid var(--mc-white); }
+.mc-cta.mc-cta-outline:hover { border-color: var(--mc-orange); color: var(--mc-orange); }
+
+.mc-cards-row {
+  max-width: 74rem;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--mc-line);
+}
+
+.mc-mini-card { background: var(--mc-steel); padding: 1.75rem 1.5rem; text-align: center; }
+.mc-mini-card h3 { font-size: 1rem; margin: 0 0 0.6rem; }
+.mc-mini-card a { color: var(--mc-orange); font-size: 0.85rem; text-decoration: underline; font-weight: 600; font-family: 'Nunito', sans-serif; }
+
+.mc-section { padding: 2.5rem 1.5rem; max-width: 74rem; margin: 0 auto; width: 100%; }
+.mc-section h2 { text-align: center; margin-bottom: 1.75rem; font-size: 1.6rem; }
+
+.mc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.1rem;
+}
+
+.mc-card {
+  background: var(--mc-steel-light);
+  border-radius: 0.4rem;
+  padding: 1.4rem;
+  border: 1px solid var(--mc-line);
+}
+
+.mc-card h3 { margin: 0 0 0.4rem; font-size: 1rem; }
+.mc-card p { margin: 0; color: var(--mc-gray); line-height: 1.45; font-size: 0.92rem; font-family: 'Nunito', sans-serif; }
+
+.mc-footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 2rem 1rem;
+  background: var(--mc-steel-light);
+  color: var(--mc-gray);
+  border-top: 4px solid var(--mc-orange);
+}
+
+.mc-powered { opacity: 0.7; font-size: 0.8rem; margin-top: 0.25rem; font-family: 'Nunito', sans-serif; }
+
+/* --- Agenda interactiva (/agenda/:slug) --- */
+
+.mc-hero-compact { padding: 2rem 1.5rem 1.5rem; }
+
+.mc-field-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--mc-white);
+  margin: 0 auto 0.6rem;
+  max-width: 30rem;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: 'Oswald', sans-serif;
+}
+
+.mc-input {
+  display: block;
+  width: 100%;
+  max-width: 30rem;
+  margin: 0 auto 1.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--mc-line);
+  border-radius: 0.3rem;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  background: var(--mc-steel-light);
+  color: var(--mc-white);
+}
+
+.mc-servicio-card {
+  background: var(--mc-steel-light);
+  border: 1px solid var(--mc-line);
+  border-radius: 0.4rem;
+  padding: 1.1rem;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  color: var(--mc-white);
+}
+
+.mc-servicio-card h3 { margin: 0 0 0.3rem; font-size: 0.98rem; font-family: 'Oswald', sans-serif; }
+.mc-servicio-card p { margin: 0; font-size: 0.85rem; color: var(--mc-gray); font-family: 'Nunito', sans-serif; }
+
+.mc-servicio-card-activa { border-color: var(--mc-orange); border-width: 2px; }
+
+.mc-agenda-grid {
+  max-width: 34rem;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.6rem;
+}
+
+.mc-slot {
+  background: var(--mc-steel-light);
+  border: 1px solid var(--mc-line);
+  border-radius: 0.3rem;
+  padding: 0.6rem 0.4rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: center;
+  font-family: 'Nunito', sans-serif;
+  color: var(--mc-white);
+}
+
+.mc-slot-activo { background: var(--mc-orange); color: var(--mc-steel); border-color: var(--mc-orange); font-weight: 700; }
+
+.mc-agenda-bar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem 1.25rem 1.75rem;
+  background: linear-gradient(180deg, rgba(34,38,43,0) 0%, var(--mc-steel) 35%);
+}
+
+.mc-cta:disabled { background: var(--mc-line); color: var(--mc-gray); cursor: not-allowed; }
+
+@media (max-width: 860px) {
+  .mc-cards-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .mc-hero { padding: 2.5rem 1.25rem; }
+  .mc-section { padding: 2.25rem 1.25rem; }
+  .mc-cta { width: 100%; text-align: center; }
+  .mc-hero-actions { flex-direction: column; }
+}

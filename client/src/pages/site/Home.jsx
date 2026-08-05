@@ -5,6 +5,10 @@ import PlantillaRestoBar from './templates/PlantillaRestoBar';
 import PlantillaEsteticaBarberia from './templates/PlantillaEsteticaBarberia';
 import PlantillaElegante from './templates/PlantillaElegante';
 import PlantillaGarage from './templates/PlantillaGarage';
+import PlantillaMedicina from './templates/PlantillaMedicina';
+import PlantillaMecanico from './templates/PlantillaMecanico';
+import PlantillaGimnasio from './templates/PlantillaGimnasio';
+import PlantillaBarberia from './templates/PlantillaBarberia';
 import { colorOverrideStyle } from '../../lib/plantillaColores';
 
 const PLANTILLAS = {
@@ -13,6 +17,10 @@ const PLANTILLAS = {
   'estetica-barberia': PlantillaEsteticaBarberia,
   flora: PlantillaElegante,
   garage: PlantillaGarage,
+  medicina: PlantillaMedicina,
+  mecanico: PlantillaMecanico,
+  gimnasio: PlantillaGimnasio,
+  barberia: PlantillaBarberia,
 };
 
 export default function Home() {

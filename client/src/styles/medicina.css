@@ -1,0 +1,255 @@
+/* Plantilla Medicina/Salud — consultorios, dentistas, podologos, doctores individuales.
+   Limpia, confiable, profesional: blanco + azul-verdoso (teal), tipografia Manrope,
+   mucho aire, sombras suaves — nada agresivo ni "vendedor", transmite calma y orden. */
+
+:root {
+  --md-white: #ffffff;
+  --md-bg: #f4f8f9;
+  --md-teal: #0f8a8a;
+  --md-teal-dark: #0a6666;
+  --md-ink: #1c2b2e;
+  --md-gray: #6b7a7d;
+  --md-line: #dfe8e9;
+}
+
+.md-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+  background: var(--md-bg);
+  color: var(--md-ink);
+}
+
+.md-page h1, .md-page h2, .md-page h3 { font-family: 'Manrope', sans-serif; font-weight: 800; }
+
+.md-hero {
+  background: var(--md-white);
+  text-align: center;
+  padding: 3.5rem 1.5rem 3rem;
+  border-bottom: 1px solid var(--md-line);
+}
+
+.md-logo {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  border-radius: 999px;
+  background: var(--md-bg);
+  border: 2px solid var(--md-teal);
+  padding: 0.5rem;
+  margin: 0 auto 1.25rem;
+  display: block;
+}
+
+.md-badge {
+  display: inline-block;
+  background: rgba(15, 138, 138, 0.1);
+  color: var(--md-teal-dark);
+  padding: 0.3rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+}
+
+.md-hero h1 { font-size: clamp(2.2rem, 6vw, 3.4rem); margin: 0.2rem 0; color: var(--md-ink); }
+
+.md-tagline {
+  color: var(--md-teal);
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-size: clamp(0.7rem, 2vw, 0.85rem);
+  margin: 0.5rem 0 1.25rem;
+  text-transform: uppercase;
+}
+
+.md-sub { max-width: 30rem; margin: 0 auto; color: var(--md-gray); }
+.md-hint { margin-top: 1rem; font-size: 0.8rem; color: var(--md-gray); }
+
+.md-hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1.5rem; }
+
+.md-qr-section {
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  background: var(--md-bg);
+}
+
+.md-qr-card {
+  background: var(--md-white);
+  border-radius: 0.6rem;
+  padding: 1.5rem;
+  text-align: center;
+  max-width: 22rem;
+  border: 1px solid var(--md-line);
+}
+
+.md-qr-img { width: 100%; max-width: 200px; border-radius: 0.3rem; }
+.md-qr-caption { font-size: 0.8rem; color: var(--md-gray); margin-top: 0.9rem; }
+
+.md-qr-download {
+  display: inline-block;
+  margin-top: 0.9rem;
+  color: var(--md-teal-dark);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: underline;
+}
+
+.md-cta {
+  display: inline-block;
+  background: var(--md-teal);
+  color: #fff;
+  font-weight: 700;
+  padding: 0.85rem 1.9rem;
+  border-radius: 999px;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.md-cta:hover { background: var(--md-teal-dark); }
+.md-cta.md-cta-outline { background: transparent; color: var(--md-teal-dark); border: 1px solid var(--md-teal); }
+.md-cta.md-cta-outline:hover { background: rgba(15, 138, 138, 0.08); }
+
+.md-cards-row {
+  max-width: 74rem;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  padding: 2.5rem 1.5rem;
+}
+
+.md-mini-card {
+  border: 1px solid var(--md-line);
+  border-radius: 0.6rem;
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  background: var(--md-white);
+}
+
+.md-mini-card h3 { font-size: 1.05rem; margin: 0 0 0.6rem; }
+.md-mini-card a { color: var(--md-teal-dark); font-size: 0.85rem; text-decoration: underline; font-weight: 600; }
+
+.md-section { padding: 2.5rem 1.5rem; max-width: 74rem; margin: 0 auto; width: 100%; }
+.md-section h2 { text-align: center; margin-bottom: 1.75rem; font-size: 1.5rem; }
+
+.md-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.1rem;
+}
+
+.md-card {
+  background: var(--md-white);
+  border-radius: 0.6rem;
+  padding: 1.4rem;
+  border: 1px solid var(--md-line);
+  box-shadow: 0 4px 14px rgba(15, 43, 46, 0.04);
+}
+
+.md-card h3 { margin: 0 0 0.4rem; color: var(--md-ink); font-weight: 700; }
+.md-card p { margin: 0; color: var(--md-gray); line-height: 1.45; font-size: 0.92rem; }
+
+.md-footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 2rem 1rem;
+  background: var(--md-ink);
+  color: var(--md-bg);
+}
+
+.md-powered { opacity: 0.6; font-size: 0.8rem; margin-top: 0.25rem; }
+
+/* --- Agenda interactiva (/agenda/:slug) --- */
+
+.md-hero-compact { padding: 2rem 1.5rem 1.5rem; }
+
+.md-field-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--md-ink);
+  margin: 0 auto 0.6rem;
+  max-width: 30rem;
+  text-align: left;
+}
+
+.md-input {
+  display: block;
+  width: 100%;
+  max-width: 30rem;
+  margin: 0 auto 1.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--md-line);
+  border-radius: 0.5rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: var(--md-white);
+}
+
+.md-servicio-card {
+  background: var(--md-white);
+  border: 1px solid var(--md-line);
+  border-radius: 0.6rem;
+  padding: 1.1rem;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+}
+
+.md-servicio-card h3 { margin: 0 0 0.3rem; font-size: 1.02rem; font-weight: 700; }
+.md-servicio-card p { margin: 0; font-size: 0.85rem; color: var(--md-gray); }
+
+.md-servicio-card-activa { border-color: var(--md-teal); border-width: 2px; background: rgba(15, 138, 138, 0.05); }
+
+.md-agenda-grid {
+  max-width: 34rem;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.6rem;
+}
+
+.md-slot {
+  background: var(--md-white);
+  border: 1px solid var(--md-line);
+  border-radius: 0.4rem;
+  padding: 0.6rem 0.4rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: center;
+  font-family: inherit;
+}
+
+.md-slot-activo { background: var(--md-teal); color: #fff; border-color: var(--md-teal); font-weight: 700; }
+
+.md-agenda-bar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem 1.25rem 1.75rem;
+  background: linear-gradient(180deg, rgba(244,248,249,0) 0%, var(--md-bg) 35%);
+}
+
+.md-cta:disabled { background: var(--md-line); color: var(--md-gray); cursor: not-allowed; }
+
+@media (max-width: 860px) {
+  .md-cards-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .md-hero { padding: 2.5rem 1.25rem; }
+  .md-section { padding: 2.25rem 1.25rem; }
+  .md-cta { width: 100%; text-align: center; }
+  .md-hero-actions { flex-direction: column; }
+}

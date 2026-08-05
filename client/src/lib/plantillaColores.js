@@ -8,6 +8,10 @@ const VARS_POR_PLANTILLA = {
   'estetica-barberia': { primario: '--eb-gold', acento: '--eb-gold-soft' },
   flora: { primario: '--fl-sage', acento: '--fl-sage-dark' },
   garage: { primario: '--gr-red', acento: '--gr-red-dark' },
+  medicina: { primario: '--md-teal', acento: '--md-teal-dark' },
+  mecanico: { primario: '--mc-orange', acento: '--mc-orange-dark' },
+  gimnasio: { primario: '--gm-lime', acento: '--gm-lime-dark' },
+  barberia: { primario: '--bb-burgundy', acento: '--bb-green' },
 };
 
 export function colorOverrideStyle(negocio) {

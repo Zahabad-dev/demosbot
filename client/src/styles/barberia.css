@@ -1,0 +1,270 @@
+/* Plantilla Barberia — masculina y clasica, distinta de "Estetica/Barberia" (esa quedo
+   femenina, negro+dorado). Verde bosque + crema + burdeos, tipografia Cinzel (serif
+   clasico de letrero de barberia), sensacion de barbershop tradicional/vintage. */
+
+:root {
+  --bb-green: #1b3a2b;
+  --bb-green-dark: #12261c;
+  --bb-cream: #f2ead9;
+  --bb-burgundy: #7a2e2e;
+  --bb-ink: #201a12;
+  --bb-gray: #5c5647;
+  --bb-line: #d8cfb8;
+}
+
+.bb-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+  background: var(--bb-cream);
+  color: var(--bb-ink);
+}
+
+.bb-page h1, .bb-page h2, .bb-page h3 { font-family: 'Cinzel', Georgia, serif; font-weight: 600; }
+
+.bb-hero {
+  background: var(--bb-green);
+  color: var(--bb-cream);
+  text-align: center;
+  padding: 3.5rem 1.5rem 3rem;
+}
+
+.bb-logo {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  border-radius: 999px;
+  background: var(--bb-green);
+  border: 2px solid var(--bb-cream);
+  padding: 0.5rem;
+  margin: 0 auto 1.25rem;
+  display: block;
+}
+
+.bb-badge {
+  display: inline-block;
+  border: 1px solid var(--bb-cream);
+  color: var(--bb-cream);
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+  margin-bottom: 1.25rem;
+}
+
+.bb-hero h1 { font-size: clamp(2.4rem, 6vw, 3.6rem); margin: 0.2rem 0; color: var(--bb-cream); }
+
+.bb-tagline {
+  color: var(--bb-burgundy);
+  background: var(--bb-cream);
+  display: inline-block;
+  padding: 0.2rem 0.9rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  font-size: clamp(0.7rem, 2vw, 0.85rem);
+  margin: 0.75rem 0 1.25rem;
+  text-transform: uppercase;
+}
+
+.bb-sub { max-width: 30rem; margin: 0 auto; opacity: 0.85; }
+.bb-hint { margin-top: 1rem; font-size: 0.8rem; opacity: 0.7; }
+
+.bb-hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1.5rem; }
+
+.bb-qr-section {
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  background: var(--bb-green-dark);
+}
+
+.bb-qr-card {
+  background: var(--bb-cream);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  text-align: center;
+  max-width: 22rem;
+}
+
+.bb-qr-img { width: 100%; max-width: 200px; border-radius: 0.3rem; }
+.bb-qr-caption { font-size: 0.8rem; color: var(--bb-gray); margin-top: 0.9rem; font-style: italic; }
+
+.bb-qr-download {
+  display: inline-block;
+  margin-top: 0.9rem;
+  background: var(--bb-green);
+  color: var(--bb-cream);
+  padding: 0.5rem 1.2rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.bb-cta {
+  display: inline-block;
+  background: var(--bb-burgundy);
+  color: var(--bb-cream);
+  font-weight: 700;
+  padding: 0.85rem 1.9rem;
+  border-radius: 999px;
+  border: none;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+.bb-cta:hover { background: #5e2323; }
+.bb-cta.bb-cta-outline { background: transparent; color: var(--bb-cream); border: 1px solid var(--bb-cream); }
+.bb-cta.bb-cta-outline:hover { background: rgba(242, 234, 217, 0.1); }
+
+.bb-cards-row {
+  max-width: 74rem;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  padding: 2.5rem 1.5rem;
+}
+
+.bb-mini-card {
+  border-top: 3px solid var(--bb-burgundy);
+  border-radius: 0.3rem;
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+}
+
+.bb-mini-card h3 { font-size: 1.05rem; margin: 0 0 0.6rem; }
+.bb-mini-card a { color: var(--bb-burgundy); font-size: 0.85rem; text-decoration: underline; font-weight: 600; }
+
+.bb-section { padding: 2.5rem 1.5rem; max-width: 74rem; margin: 0 auto; width: 100%; }
+.bb-section h2 { text-align: center; margin-bottom: 0.5rem; }
+.bb-section h2::after {
+  content: '';
+  display: block;
+  width: 48px;
+  height: 2px;
+  background: var(--bb-burgundy);
+  margin: 0.75rem auto 1.75rem;
+}
+
+.bb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.1rem;
+}
+
+.bb-card {
+  background: #fff;
+  border-radius: 0.4rem;
+  padding: 1.4rem;
+  border-top: 2px solid var(--bb-burgundy);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+}
+
+.bb-card h3 { margin: 0 0 0.4rem; color: var(--bb-ink); font-weight: 600; }
+.bb-card p { margin: 0; color: var(--bb-gray); line-height: 1.45; font-size: 0.92rem; }
+
+.bb-footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 2rem 1rem;
+  background: var(--bb-green);
+  color: var(--bb-cream);
+}
+
+.bb-powered { opacity: 0.55; font-size: 0.8rem; margin-top: 0.25rem; }
+
+/* --- Agenda interactiva (/agenda/:slug) --- */
+
+.bb-hero-compact { padding: 2rem 1.5rem 1.5rem; }
+
+.bb-field-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--bb-ink);
+  margin: 0 auto 0.6rem;
+  max-width: 30rem;
+  text-align: left;
+}
+
+.bb-input {
+  display: block;
+  width: 100%;
+  max-width: 30rem;
+  margin: 0 auto 1.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--bb-line);
+  border-radius: 0.4rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  background: #fff;
+}
+
+.bb-servicio-card {
+  background: #fff;
+  border: 1px solid var(--bb-line);
+  border-radius: 0.4rem;
+  padding: 1.1rem;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+}
+
+.bb-servicio-card h3 { margin: 0 0 0.3rem; font-family: 'Cinzel', Georgia, serif; font-size: 1rem; }
+.bb-servicio-card p { margin: 0; font-size: 0.85rem; color: var(--bb-gray); }
+
+.bb-servicio-card-activa { border-color: var(--bb-burgundy); border-width: 2px; background: #fdf8ea; }
+
+.bb-agenda-grid {
+  max-width: 34rem;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.6rem;
+}
+
+.bb-slot {
+  background: #fff;
+  border: 1px solid var(--bb-line);
+  border-radius: 0.4rem;
+  padding: 0.6rem 0.4rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: center;
+  font-family: inherit;
+}
+
+.bb-slot-activo { background: var(--bb-burgundy); color: var(--bb-cream); border-color: var(--bb-burgundy); font-weight: 700; }
+
+.bb-agenda-bar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem 1.25rem 1.75rem;
+  background: linear-gradient(180deg, rgba(242,234,217,0) 0%, var(--bb-cream) 35%);
+}
+
+.bb-cta:disabled { background: var(--bb-line); color: var(--bb-gray); cursor: not-allowed; }
+
+@media (max-width: 860px) {
+  .bb-cards-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .bb-hero { padding: 2.5rem 1.25rem; }
+  .bb-section { padding: 2.25rem 1.25rem; }
+  .bb-cta { width: 100%; text-align: center; }
+  .bb-hero-actions { flex-direction: column; }
+}

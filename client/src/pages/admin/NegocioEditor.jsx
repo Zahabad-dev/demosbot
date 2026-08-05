@@ -107,6 +107,10 @@ export default function NegocioEditor() {
             <option value="estetica-barberia">Estetica / Barberia</option>
             <option value="flora">Flora (restaurante elegante)</option>
             <option value="garage">Garage (lote de autos)</option>
+            <option value="medicina">Medicina/Salud (consultorio, doctor)</option>
+            <option value="mecanico">Mecánico (taller automotriz)</option>
+            <option value="gimnasio">Gimnasio</option>
+            <option value="barberia">Barbería (masculina)</option>
           </select>
         </div>
         <div className="field">
