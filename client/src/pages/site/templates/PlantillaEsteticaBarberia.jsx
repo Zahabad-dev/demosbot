@@ -76,7 +76,9 @@ export default function PlantillaEsteticaBarberia({ negocio, faq, error }) {
 
       <footer className="eb-footer">
         <p>{negocio?.nombre || 'Glow Studio'} · {negocio?.ciudad || ''}</p>
-        <p className="eb-powered">Demo del ecosistema de bots — Black Sheep Agencia</p>
+        {negocio?.es_demo !== false && (
+          <p className="eb-powered">Demo del ecosistema de bots — Black Sheep Agencia</p>
+        )}
       </footer>
     </div>
   );

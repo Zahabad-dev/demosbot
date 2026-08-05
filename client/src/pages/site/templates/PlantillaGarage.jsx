@@ -78,7 +78,9 @@ export default function PlantillaGarage({ negocio, faq, error }) {
 
       <footer className="gr-footer">
         <p>{nombre} · {negocio?.ciudad || ''}</p>
-        <p className="gr-powered">Demo del ecosistema de bots — Black Sheep Agencia</p>
+        {negocio?.es_demo !== false && (
+          <p className="gr-powered">Demo del ecosistema de bots — Black Sheep Agencia</p>
+        )}
       </footer>
     </div>
   );

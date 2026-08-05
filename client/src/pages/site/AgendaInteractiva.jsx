@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { api } from '../../lib/apiClient';
 import '../../styles/estetica-barberia.css';
 import '../../styles/garage.css';
+import { colorOverrideStyle } from '../../lib/plantillaColores';
 
 const WHATSAPP_FALLBACK = '5217751667681';
 
@@ -71,7 +72,7 @@ export default function AgendaInteractiva() {
   };
 
   return (
-    <div className={`${px}-page`}>
+    <div className={`${px}-page`} style={colorOverrideStyle(negocio)}>
       <header className={`${px}-hero ${px}-hero-compact`}>
         {negocio?.logo_data_url && <img src={negocio.logo_data_url} alt="" className={`${px}-logo`} />}
         <h1>{negocio?.nombre || (esGarage ? 'Mr. Garage' : 'Glow Studio')}</h1>
@@ -144,7 +145,9 @@ export default function AgendaInteractiva() {
 
       <footer className={`${px}-footer`}>
         <p>{negocio?.nombre || ''} · {negocio?.ciudad || ''}</p>
-        <p className={`${px}-powered`}>Demo del ecosistema de bots — Black Sheep Agencia</p>
+        {negocio?.es_demo !== false && (
+          <p className={`${px}-powered`}>Demo del ecosistema de bots — Black Sheep Agencia</p>
+        )}
       </footer>
     </div>
   );

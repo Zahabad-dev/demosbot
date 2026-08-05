@@ -1,14 +1,23 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../../lib/apiClient';
+import { useAuth } from '../../context/AuthContext';
 
 const MAX_LOGO_BYTES = 2 * 1024 * 1024; // 2MB
 
 export default function NegocioEditor() {
   const { negocioId } = useParams();
+  const { user } = useAuth();
   const [form, setForm] = useState(null);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
+
+  // Esta pantalla mueve system_prompt/canal/plantilla — configuracion sensible que un
+  // cliente activado nunca debe tocar (aunque llegue aqui pegando la URL directo, el
+  // backend igual lo bloquea en el PUT, pero aqui ni se le muestra el formulario).
+  if (user?.rol !== 'agencia') {
+    return <p className="error-msg">Esta sección es solo para la agencia. Si necesitas editar tu FAQ, usa el link "FAQ" del panel.</p>;
+  }
 
   useEffect(() => {
     api.get(`/admin/negocios/${negocioId}`).then(setForm).catch((e) => setError(e.message));
@@ -115,6 +124,35 @@ export default function NegocioEditor() {
           )}
           <input type="file" accept="image/*" onChange={onLogoChange} />
         </div>
+
+        {!form.es_demo && (
+          <>
+            <div className="field">
+              <label>Este negocio ya es cliente activo</label>
+              <select value={form.activo ? 'true' : 'false'} onChange={(e) => setForm({ ...form, activo: e.target.value === 'true' })}>
+                <option value="false">Apagado (aún no conecto su canal real)</option>
+                <option value="true">Encendido (respondiendo por su WhatsApp real)</option>
+              </select>
+            </div>
+            <div className="field">
+              <label>Dominio propio (ej. www.sunegocio.com)</label>
+              <input value={form.dominio || ''} onChange={set('dominio')} placeholder="www.sunegocio.com" />
+            </div>
+            <div className="field">
+              <label>Vencimiento del dominio</label>
+              <input type="date" value={form.dominio_vence ? form.dominio_vence.slice(0, 10) : ''} onChange={set('dominio_vence')} />
+            </div>
+            <div className="field">
+              <label>Color primario (marca del cliente)</label>
+              <input type="color" value={form.color_primario || '#000000'} onChange={set('color_primario')} />
+            </div>
+            <div className="field">
+              <label>Color de acento</label>
+              <input type="color" value={form.color_acento || '#000000'} onChange={set('color_acento')} />
+            </div>
+          </>
+        )}
+
         {error && <p className="error-msg">{error}</p>}
         {saved && <p style={{ color: '#8fd18f' }}>Guardado.</p>}
         <button type="submit">Guardar cambios</button>

@@ -40,3 +40,10 @@ export function scopeNegocio(req, res, next) {
   }
   next();
 }
+
+// Solo la agencia puede pasar — usado en configuracion sensible del negocio (system_prompt,
+// canal, plantilla, dominio...) que un cliente activado NUNCA debe poder tocar.
+export function requireAgencia(req, res, next) {
+  if (req.auth.rol !== 'agencia') return res.status(403).json({ error: 'Solo la agencia puede hacer esto' });
+  next();
+}

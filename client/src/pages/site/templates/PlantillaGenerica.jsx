@@ -49,7 +49,9 @@ export default function PlantillaGenerica({ negocio, faq, error }) {
 
       <footer className="footer">
         <p>{negocio?.nombre || 'Tu negocio'} · {negocio?.ciudad || ''}</p>
-        <p className="powered">Demo del ecosistema de bots — Black Sheep Agencia</p>
+        {negocio?.es_demo !== false && (
+          <p className="powered">Demo del ecosistema de bots — Black Sheep Agencia</p>
+        )}
       </footer>
     </div>
   );

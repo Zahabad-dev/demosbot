@@ -17,9 +17,22 @@ CREATE TABLE IF NOT EXISTS negocios (
   tipo_funcion   VARCHAR(20) NOT NULL DEFAULT 'ninguna', -- 'ninguna' | 'pedidos' | 'citas' — INDEPENDIENTE de `plantilla`
   logo_data_url  TEXT,                                 -- logo del negocio como data URL base64 (editable desde el panel)
   activo         BOOLEAN DEFAULT true,
+  es_demo        BOOLEAN NOT NULL DEFAULT true,         -- false = cliente real activado (paga), ya no compite por el switch de demos
+  dominio        VARCHAR(255) UNIQUE,                   -- dominio propio del cliente (ej. www.sunegocio.com), NULL = usa el dominio compartido de demos
+  dominio_vence  DATE,                                  -- fecha de renovacion del dominio, para que la agencia no la pierda de vista
+  color_primario VARCHAR(7),                            -- hex, override de marca del cliente sobre la plantilla (NULL = usa el color por defecto de la plantilla)
+  color_acento   VARCHAR(7),
   creado_en      TIMESTAMPTZ DEFAULT NOW(),
   actualizado_en TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Migracion para instalaciones ya existentes (CREATE TABLE IF NOT EXISTS de arriba no altera
+-- una tabla que ya existe) — agrega las columnas nuevas si todavia no estan.
+ALTER TABLE negocios ADD COLUMN IF NOT EXISTS es_demo BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE negocios ADD COLUMN IF NOT EXISTS dominio VARCHAR(255) UNIQUE;
+ALTER TABLE negocios ADD COLUMN IF NOT EXISTS dominio_vence DATE;
+ALTER TABLE negocios ADD COLUMN IF NOT EXISTS color_primario VARCHAR(7);
+ALTER TABLE negocios ADD COLUMN IF NOT EXISTS color_acento VARCHAR(7);
 
 CREATE TABLE IF NOT EXISTS faq (
   id             SERIAL PRIMARY KEY,

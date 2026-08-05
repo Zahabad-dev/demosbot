@@ -112,7 +112,9 @@ export default function PlantillaElegante({ negocio, faq, error }) {
 
       <footer className="fl-footer">
         <p>{negocio?.nombre || 'Flora'} · {negocio?.ciudad || ''}</p>
-        <p className="fl-powered">Demo del ecosistema de bots — Black Sheep Agencia</p>
+        {negocio?.es_demo !== false && (
+          <p className="fl-powered">Demo del ecosistema de bots — Black Sheep Agencia</p>
+        )}
       </footer>
     </div>
   );

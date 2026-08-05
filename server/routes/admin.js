@@ -1,6 +1,8 @@
 import { Router } from 'express';
+import crypto from 'crypto';
+import bcrypt from 'bcryptjs';
 import { query, withTransaction } from '../db.js';
-import { login, requireAuth, scopeNegocio } from '../auth.js';
+import { login, requireAuth, scopeNegocio, requireAgencia } from '../auth.js';
 import { config } from '../config.js';
 
 export const adminRouter = Router();
@@ -25,13 +27,27 @@ adminRouter.post('/logout', (req, res) => {
 
 adminRouter.get('/me', requireAuth, (req, res) => res.json({ user: req.auth }));
 
+// Verifica que la fila (de una tabla relacionada a negocio_id) pertenezca al negocio del
+// usuario logueado, salvo rol 'agencia' (ve todo). Usado en los PUT/DELETE de faq, links,
+// solicitudes, pedidos, citas y reservas, que se referencian por su propio id (no por
+// negocioId en la URL) y por eso no quedan cubiertos por scopeNegocio.
+async function assertOwnsRow(req, res, tabla) {
+  const { rows } = await query(`SELECT negocio_id FROM ${tabla} WHERE id = $1`, [req.params.id]);
+  if (!rows[0]) { res.status(404).json({ error: 'No encontrado' }); return null; }
+  if (req.auth.rol !== 'agencia' && rows[0].negocio_id !== req.auth.negocioId) {
+    res.status(403).json({ error: 'Sin acceso a este registro' });
+    return null;
+  }
+  return rows[0];
+}
+
 // Lista de negocios visibles para el admin logueado (agencia ve todos, cliente solo el suyo).
 // "pendientes" suma pedidos/citas/reservas nuevos + solicitudes no leidas de ese negocio —
 // se usa como badge de notificacion junto al link "Solicitudes" de cada fila.
 adminRouter.get('/negocios', requireAuth, async (req, res) => {
   const isAgencia = req.auth.rol === 'agencia';
   const { rows } = await query(
-    `SELECT n.id, n.slug, n.nombre, n.giro, n.ciudad, n.tono, n.activo,
+    `SELECT n.id, n.slug, n.nombre, n.giro, n.ciudad, n.tono, n.activo, n.es_demo, n.dominio,
        COALESCE(p.pendientes, 0) + COALESCE(c.pendientes, 0) + COALESCE(r.pendientes, 0) + COALESCE(s.pendientes, 0) AS pendientes
      FROM negocios n
      LEFT JOIN (SELECT negocio_id, COUNT(*) AS pendientes FROM pedidos WHERE estado = 'Nuevo' GROUP BY negocio_id) p ON p.negocio_id = n.id
@@ -46,14 +62,23 @@ adminRouter.get('/negocios', requireAuth, async (req, res) => {
 });
 
 // --- El panel "moldeable": editar giro / tono / system_prompt de un negocio ---
+// Lectura: agencia ve cualquiera, cliente solo el suyo (scopeNegocio). El cliente puede
+// necesitar leer estos datos (ej. para mostrar su propio nombre en el panel), pero JAMAS
+// puede escribirlos — ver el PUT de abajo, restringido a requireAgencia.
 adminRouter.get('/negocios/:negocioId', requireAuth, scopeNegocio, async (req, res) => {
   const { rows } = await query('SELECT * FROM negocios WHERE id = $1', [req.params.negocioId]);
   if (!rows[0]) return res.status(404).json({ error: 'No encontrado' });
   res.json(rows[0]);
 });
 
-adminRouter.put('/negocios/:negocioId', requireAuth, scopeNegocio, async (req, res) => {
-  const { nombre, giro, ciudad, tono, system_prompt, whatsapp_numero, chatwoot_inbox_id, chatwoot_account_id, activo, plantilla, logo_data_url, tipo_funcion } = req.body;
+// Solo agencia: system_prompt, canal (WhatsApp/Chatwoot), plantilla, dominio y colores de
+// marca son configuracion sensible que un cliente activado nunca debe poder tocar el mismo.
+adminRouter.put('/negocios/:negocioId', requireAuth, requireAgencia, async (req, res) => {
+  const {
+    nombre, giro, ciudad, tono, system_prompt, whatsapp_numero, chatwoot_inbox_id,
+    chatwoot_account_id, activo, plantilla, logo_data_url, tipo_funcion,
+    dominio, dominio_vence, color_primario, color_acento,
+  } = req.body;
   const { rows } = await query(
     `UPDATE negocios SET
        nombre = COALESCE($2, nombre),
@@ -67,21 +92,24 @@ adminRouter.put('/negocios/:negocioId', requireAuth, scopeNegocio, async (req, r
        activo = COALESCE($10, activo),
        plantilla = COALESCE($11, plantilla),
        logo_data_url = COALESCE($12, logo_data_url),
-       tipo_funcion = COALESCE($13, tipo_funcion)
+       tipo_funcion = COALESCE($13, tipo_funcion),
+       dominio = COALESCE($14, dominio),
+       dominio_vence = COALESCE($15, dominio_vence),
+       color_primario = COALESCE($16, color_primario),
+       color_acento = COALESCE($17, color_acento)
      WHERE id = $1 RETURNING *`,
-    [req.params.negocioId, nombre, giro, ciudad, tono, system_prompt, whatsapp_numero, chatwoot_inbox_id, chatwoot_account_id, activo, plantilla, logo_data_url, tipo_funcion]
+    [req.params.negocioId, nombre, giro, ciudad, tono, system_prompt, whatsapp_numero, chatwoot_inbox_id, chatwoot_account_id, activo, plantilla, logo_data_url, tipo_funcion, dominio, dominio_vence, color_primario, color_acento]
   );
   res.json(rows[0]);
 });
 
-// Activar un negocio como "la demo en vivo" — desactiva todos los demás en la misma
-// transacción, así el flujo de n8n (que filtra por activo = true) nunca lee dos
-// negocios a la vez ni se cruza con datos de otra demo. Los datos de los negocios
-// desactivados no se tocan: solo cambia la bandera activo.
-adminRouter.put('/negocios/:negocioId/activar', requireAuth, async (req, res) => {
-  if (req.auth.rol !== 'agencia') return res.status(403).json({ error: 'Solo la agencia puede cambiar el negocio activo' });
+// Activar un negocio como "la demo en vivo" — desactiva a los DEMAS NEGOCIOS QUE SIGUEN
+// SIENDO DEMO (es_demo = true) en la misma transaccion. Un cliente ya activado (es_demo =
+// false) tiene su propio inbox/dominio real y nunca debe apagarse por este switch, aunque
+// se active una demo nueva para presentarle a otro prospecto.
+adminRouter.put('/negocios/:negocioId/activar', requireAuth, requireAgencia, async (req, res) => {
   const negocio = await withTransaction(async (client) => {
-    await client.query('UPDATE negocios SET activo = false WHERE id <> $1', [req.params.negocioId]);
+    await client.query('UPDATE negocios SET activo = false WHERE id <> $1 AND es_demo = true', [req.params.negocioId]);
     const { rows } = await client.query('UPDATE negocios SET activo = true WHERE id = $1 RETURNING *', [req.params.negocioId]);
     return rows[0];
   });
@@ -89,11 +117,48 @@ adminRouter.put('/negocios/:negocioId/activar', requireAuth, async (req, res) =>
   res.json(negocio);
 });
 
+// Activar un negocio como CLIENTE REAL (ya pago): se marca es_demo = false (deja de competir
+// por el switch de arriba, corre independiente y permanente) y se crea su usuario de acceso
+// al panel, con acceso restringido solo a FAQ y a sus solicitudes/pedidos/citas/reservas — el
+// frontend oculta "Editar bot" para rol 'cliente', y el backend lo bloquea con requireAgencia
+// en el PUT de negocios de todas formas, asi que aunque alguien intente pegarle directo al
+// endpoint, no puede tocar el system_prompt/canal/plantilla.
+// El numero real de WhatsApp y el logo los sigue dando de alta la agencia a mano despues.
+adminRouter.post('/negocios/:negocioId/activar-cliente', requireAuth, requireAgencia, async (req, res) => {
+  const { username } = req.body;
+  if (!username) return res.status(400).json({ error: 'Falta el usuario/correo del cliente' });
+
+  const { rows: negRows } = await query('SELECT id, nombre FROM negocios WHERE id = $1', [req.params.negocioId]);
+  if (!negRows[0]) return res.status(404).json({ error: 'Negocio no encontrado' });
+
+  const password = crypto.randomBytes(9).toString('base64url'); // ~12 caracteres, legible
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  try {
+    const { negocio, usuario } = await withTransaction(async (client) => {
+      const { rows } = await client.query(
+        'UPDATE negocios SET es_demo = false WHERE id = $1 RETURNING *',
+        [req.params.negocioId]
+      );
+      const { rows: userRows } = await client.query(
+        `INSERT INTO admin_users (negocio_id, username, password_hash, nombre, rol)
+         VALUES ($1, $2, $3, $4, 'cliente') RETURNING id, username, nombre, rol`,
+        [req.params.negocioId, username, passwordHash, negRows[0].nombre]
+      );
+      return { negocio: rows[0], usuario: userRows[0] };
+    });
+    // La contrasena en texto plano solo se devuelve UNA VEZ aqui — no se guarda en ningun lado.
+    res.status(201).json({ negocio, usuario, password });
+  } catch (err) {
+    if (err.code === '23505') return res.status(409).json({ error: 'Ese usuario/correo ya existe' });
+    throw err;
+  }
+});
+
 // Solo rol 'agencia' puede crear negocios nuevos (nuevos clientes/demos).
 // Nace SIEMPRE inactivo (activo = false): así nunca compite por el chatwoot_inbox_id
 // con la demo que esté activa en ese momento. Se activa a propósito con /activar.
-adminRouter.post('/negocios', requireAuth, async (req, res) => {
-  if (req.auth.rol !== 'agencia') return res.status(403).json({ error: 'Solo la agencia puede crear negocios' });
+adminRouter.post('/negocios', requireAuth, requireAgencia, async (req, res) => {
   const { slug, nombre, giro, ciudad, tono, system_prompt } = req.body;
   const { rows } = await query(
     `INSERT INTO negocios (slug, nombre, giro, ciudad, tono, system_prompt, activo)
@@ -103,7 +168,7 @@ adminRouter.post('/negocios', requireAuth, async (req, res) => {
   res.status(201).json(rows[0]);
 });
 
-// --- FAQ (moldeable por negocio) ---
+// --- FAQ (moldeable por negocio) — el cliente SI puede leer/escribir la suya ---
 adminRouter.get('/negocios/:negocioId/faq', requireAuth, scopeNegocio, async (req, res) => {
   const { rows } = await query('SELECT * FROM faq WHERE negocio_id = $1 ORDER BY orden, id', [req.params.negocioId]);
   res.json(rows);
@@ -120,6 +185,7 @@ adminRouter.post('/negocios/:negocioId/faq', requireAuth, scopeNegocio, async (r
 });
 
 adminRouter.put('/faq/:id', requireAuth, async (req, res) => {
+  if (!(await assertOwnsRow(req, res, 'faq'))) return;
   const { categoria, pregunta, respuesta, activo, orden, imagen_url } = req.body;
   const { rows } = await query(
     `UPDATE faq SET
@@ -136,17 +202,19 @@ adminRouter.put('/faq/:id', requireAuth, async (req, res) => {
 });
 
 adminRouter.delete('/faq/:id', requireAuth, async (req, res) => {
+  if (!(await assertOwnsRow(req, res, 'faq'))) return;
   await query('DELETE FROM faq WHERE id = $1', [req.params.id]);
   res.json({ ok: true });
 });
 
-// --- Links ---
+// --- Links (solo agencia: son datos tecnicos de integracion, no contenido de FAQ) ---
 adminRouter.get('/negocios/:negocioId/links', requireAuth, scopeNegocio, async (req, res) => {
   const { rows } = await query('SELECT * FROM links WHERE negocio_id = $1 ORDER BY id', [req.params.negocioId]);
   res.json(rows);
 });
 
 adminRouter.put('/links/:id', requireAuth, async (req, res) => {
+  if (!(await assertOwnsRow(req, res, 'links'))) return;
   const { url, descripcion, activo } = req.body;
   const { rows } = await query(
     `UPDATE links SET url = COALESCE($2, url), descripcion = COALESCE($3, descripcion), activo = COALESCE($4, activo)
@@ -177,6 +245,7 @@ adminRouter.get('/negocios/:negocioId/solicitudes', requireAuth, scopeNegocio, a
 });
 
 adminRouter.put('/solicitudes/:id', requireAuth, async (req, res) => {
+  if (!(await assertOwnsRow(req, res, 'solicitudes'))) return;
   const { estado, prioridad, bot_bloqueado, leido, motivo_baneo } = req.body;
   const { rows } = await query(
     `UPDATE solicitudes SET
@@ -196,6 +265,7 @@ adminRouter.put('/solicitudes/:id', requireAuth, async (req, res) => {
 adminRouter.get('/solicitudes/:solicitudId/pedidos', requireAuth, async (req, res) => {
   const { rows: sol } = await query('SELECT negocio_id, telefono FROM solicitudes WHERE id = $1', [req.params.solicitudId]);
   if (!sol[0]) return res.status(404).json({ error: 'Solicitud no encontrada' });
+  if (req.auth.rol !== 'agencia' && sol[0].negocio_id !== req.auth.negocioId) return res.status(403).json({ error: 'Sin acceso a este registro' });
   const { rows } = await query(
     'SELECT * FROM pedidos WHERE negocio_id = $1 AND telefono = $2 ORDER BY creado_en DESC',
     [sol[0].negocio_id, sol[0].telefono]
@@ -204,6 +274,7 @@ adminRouter.get('/solicitudes/:solicitudId/pedidos', requireAuth, async (req, re
 });
 
 adminRouter.put('/pedidos/:id', requireAuth, async (req, res) => {
+  if (!(await assertOwnsRow(req, res, 'pedidos'))) return;
   const { estado } = req.body;
   const { rows } = await query(
     'UPDATE pedidos SET estado = COALESCE($2, estado) WHERE id = $1 RETURNING *',
@@ -217,6 +288,7 @@ adminRouter.put('/pedidos/:id', requireAuth, async (req, res) => {
 adminRouter.get('/solicitudes/:solicitudId/citas', requireAuth, async (req, res) => {
   const { rows: sol } = await query('SELECT negocio_id, telefono FROM solicitudes WHERE id = $1', [req.params.solicitudId]);
   if (!sol[0]) return res.status(404).json({ error: 'Solicitud no encontrada' });
+  if (req.auth.rol !== 'agencia' && sol[0].negocio_id !== req.auth.negocioId) return res.status(403).json({ error: 'Sin acceso a este registro' });
   const { rows } = await query(
     'SELECT * FROM citas WHERE negocio_id = $1 AND telefono = $2 ORDER BY creado_en DESC',
     [sol[0].negocio_id, sol[0].telefono]
@@ -225,6 +297,7 @@ adminRouter.get('/solicitudes/:solicitudId/citas', requireAuth, async (req, res)
 });
 
 adminRouter.put('/citas/:id', requireAuth, async (req, res) => {
+  if (!(await assertOwnsRow(req, res, 'citas'))) return;
   const { estado } = req.body;
   const { rows } = await query(
     'UPDATE citas SET estado = COALESCE($2, estado) WHERE id = $1 RETURNING *',
@@ -239,6 +312,7 @@ adminRouter.put('/citas/:id', requireAuth, async (req, res) => {
 adminRouter.get('/solicitudes/:solicitudId/reservas', requireAuth, async (req, res) => {
   const { rows: sol } = await query('SELECT negocio_id, telefono FROM solicitudes WHERE id = $1', [req.params.solicitudId]);
   if (!sol[0]) return res.status(404).json({ error: 'Solicitud no encontrada' });
+  if (req.auth.rol !== 'agencia' && sol[0].negocio_id !== req.auth.negocioId) return res.status(403).json({ error: 'Sin acceso a este registro' });
   const { rows } = await query(
     'SELECT * FROM reservas WHERE negocio_id = $1 AND telefono = $2 ORDER BY creado_en DESC',
     [sol[0].negocio_id, sol[0].telefono]
@@ -247,6 +321,7 @@ adminRouter.get('/solicitudes/:solicitudId/reservas', requireAuth, async (req, r
 });
 
 adminRouter.put('/reservas/:id', requireAuth, async (req, res) => {
+  if (!(await assertOwnsRow(req, res, 'reservas'))) return;
   const { estado } = req.body;
   const { rows } = await query(
     'UPDATE reservas SET estado = COALESCE($2, estado) WHERE id = $1 RETURNING *',

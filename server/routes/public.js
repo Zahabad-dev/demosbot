@@ -8,29 +8,46 @@ export const publicRouter = Router();
 // funcionando aunque el negocio deje de ser el activo del switch.
 publicRouter.get('/negocio/:slug', async (req, res) => {
   const { rows } = await query(
-    'SELECT slug, nombre, giro, ciudad, tono, whatsapp_numero, plantilla, logo_data_url FROM negocios WHERE slug = $1',
+    `SELECT slug, nombre, giro, ciudad, tono, whatsapp_numero, plantilla, logo_data_url, es_demo, color_primario, color_acento
+     FROM negocios WHERE slug = $1`,
     [req.params.slug]
   );
   if (!rows[0]) return res.status(404).json({ error: 'Negocio no encontrado' });
   res.json(rows[0]);
 });
 
-// El sitio público sigue al negocio que este activo en ese momento (el switch del panel),
-// sin importar cual sea su slug — asi "segun el bot que se elija" es la pagina que se muestra.
+const NEGOCIO_PUBLICO_COLS = 'id, slug, nombre, giro, ciudad, tono, whatsapp_numero, plantilla, logo_data_url, es_demo, color_primario, color_acento';
+
+// Resuelve que negocio mostrar: primero por dominio propio (clientes reales activados con
+// su propio dominio), y si el host no coincide con ninguno (ej. el dominio compartido de
+// demos), cae al switch de siempre por `activo = true`. Asi un mismo servicio sirve tanto
+// las demos como N clientes reales, cada quien en su propio dominio, sin pisarse.
+export async function resolverNegocioPorHost(hostname) {
+  if (hostname) {
+    const { rows } = await query(
+      `SELECT ${NEGOCIO_PUBLICO_COLS} FROM negocios WHERE lower(dominio) = lower($1) LIMIT 1`,
+      [hostname]
+    );
+    if (rows[0]) return rows[0];
+  }
+  const { rows } = await query(`SELECT ${NEGOCIO_PUBLICO_COLS} FROM negocios WHERE activo = true LIMIT 1`);
+  return rows[0] || null;
+}
+
+// El sitio público sigue al negocio de su propio dominio si tiene uno configurado, o al
+// negocio activo del switch de demos si no (sin importar cual sea su slug).
 publicRouter.get('/negocio-activo', async (req, res) => {
-  const { rows } = await query(
-    'SELECT slug, nombre, giro, ciudad, tono, whatsapp_numero, plantilla, logo_data_url FROM negocios WHERE activo = true LIMIT 1'
-  );
-  if (!rows[0]) return res.status(404).json({ error: 'No hay negocio activo' });
-  res.json(rows[0]);
+  const negocio = await resolverNegocioPorHost(req.hostname);
+  if (!negocio) return res.status(404).json({ error: 'No hay negocio activo' });
+  res.json(negocio);
 });
 
 publicRouter.get('/negocio-activo/faq', async (req, res) => {
+  const negocio = await resolverNegocioPorHost(req.hostname);
+  if (!negocio) return res.json([]);
   const { rows } = await query(
-    `SELECT f.categoria, f.pregunta, f.respuesta, f.imagen_url
-     FROM faq f JOIN negocios n ON n.id = f.negocio_id
-     WHERE n.activo = true AND f.activo = true
-     ORDER BY f.orden ASC, f.id ASC`
+    'SELECT categoria, pregunta, respuesta, imagen_url FROM faq WHERE negocio_id = $1 AND activo = true ORDER BY orden ASC, id ASC',
+    [negocio.id]
   );
   res.json(rows);
 });

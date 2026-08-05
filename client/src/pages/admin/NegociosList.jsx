@@ -10,6 +10,7 @@ export default function NegociosList() {
   const isAgencia = user?.rol === 'agencia';
   const [negocios, setNegocios] = useState([]);
   const [activandoId, setActivandoId] = useState(null);
+  const [activandoClienteId, setActivandoClienteId] = useState(null);
   const [nuevo, setNuevo] = useState(emptyNegocio);
   const [error, setError] = useState('');
 
@@ -30,6 +31,25 @@ export default function NegociosList() {
     }
   };
 
+  // El cliente ya pago: se marca como no-demo y se le crea su usuario del panel (solo FAQ +
+  // solicitudes/pedidos/citas/reservas). La contraseña se muestra UNA sola vez aqui — despues
+  // no queda visible en ningun lado, hay que copiarla y pasarsela al cliente en este momento.
+  const onActivarCliente = async (n) => {
+    const username = window.prompt(`Correo/usuario para el panel de ${n.nombre}:`);
+    if (!username) return;
+    setActivandoClienteId(n.id);
+    setError('');
+    try {
+      const res = await api.post(`/admin/negocios/${n.id}/activar-cliente`, { username });
+      window.alert(`Cliente activado.\n\nUsuario: ${res.usuario.username}\nContraseña: ${res.password}\n\nCópiala ahora — no se vuelve a mostrar.`);
+      await load();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setActivandoClienteId(null);
+    }
+  };
+
   const onCreate = async (e) => {
     e.preventDefault();
     setError('');
@@ -47,18 +67,20 @@ export default function NegociosList() {
       <h1>Negocios</h1>
       <p style={{ color: '#9aa1ad' }}>
         Cada fila es un negocio moldeado sobre el mismo bot: cambia giro, tono, system prompt y FAQ
-        sin tocar código. Los datos de cada negocio se quedan guardados aunque no esté activo —
-        solo uno puede estar <strong>activo</strong> a la vez (el que contesta de verdad por WhatsApp).
+        sin tocar código. Entre las <strong>demos</strong> solo una puede estar activa a la vez
+        (para presentar prospectos sin pisar otra demo). Un negocio marcado como <strong>Cliente</strong>
+        ya no compite por ese switch — corre de forma independiente y permanente con su propio canal.
       </p>
 
       {negocios.map((n) => (
         <div className="faq-row" key={n.id}>
           <strong>
             {n.nombre} {n.activo && <span className="badge-activo">Activo</span>}
+            {!n.es_demo && <span className="badge-atencion">Cliente{n.dominio ? ` · ${n.dominio}` : ''}</span>}
           </strong>
           <span style={{ color: '#9aa1ad' }}>{n.giro} · {n.ciudad}</span>
           <div className="faq-row-actions">
-            {isAgencia && !n.activo && (
+            {isAgencia && n.es_demo && !n.activo && (
               <button
                 className="secondary"
                 onClick={() => onActivar(n)}
@@ -67,7 +89,16 @@ export default function NegociosList() {
                 {activandoId === n.id ? 'Activando…' : 'Activar demo'}
               </button>
             )}
-            <Link to={`/admin/negocios/${n.id}`}><button className="secondary">Editar bot</button></Link>
+            {isAgencia && n.es_demo && (
+              <button
+                className="secondary"
+                onClick={() => onActivarCliente(n)}
+                disabled={activandoClienteId === n.id}
+              >
+                {activandoClienteId === n.id ? 'Activando…' : 'Activar Cliente'}
+              </button>
+            )}
+            {isAgencia && <Link to={`/admin/negocios/${n.id}`}><button className="secondary">Editar bot</button></Link>}
             <Link to={`/admin/negocios/${n.id}/faq`}><button className="secondary">FAQ</button></Link>
             <Link to={`/admin/negocios/${n.id}/solicitudes`}>
               <button className="secondary">

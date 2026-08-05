@@ -56,7 +56,7 @@
 .admin button.password-toggle:hover { opacity: 0.8; }
 
 .admin button {
-  background: #F5C518;
+  background: var(--admin-accent, #F5C518);
   color: #14181f;
   border: none;
   padding: 0.7rem 1.2rem;
@@ -65,7 +65,7 @@
   cursor: pointer;
 }
 
-.admin button.secondary { background: transparent; color: #F5C518; border: 1px solid #F5C518; }
+.admin button.secondary { background: transparent; color: var(--admin-accent, #F5C518); border: 1px solid var(--admin-accent, #F5C518); }
 .admin button.danger { background: #C1272D; color: #fff; }
 
 .admin-shell { display: flex; min-height: 100vh; }
@@ -182,7 +182,7 @@
   min-width: 1.2rem;
   height: 1.2rem;
   padding: 0 0.3rem;
-  background: #F5C518;
+  background: var(--admin-accent, #F5C518);
   color: #1e232c;
   font-size: 0.7rem;
   font-weight: 800;
@@ -193,8 +193,8 @@
 .badge-atencion {
   display: inline-block;
   background: rgba(245, 197, 24, 0.15);
-  color: #F5C518;
-  border: 1px solid #F5C518;
+  color: var(--admin-accent, #F5C518);
+  border: 1px solid var(--admin-accent, #F5C518);
   font-size: 0.7rem;
   font-weight: 700;
   padding: 0.15rem 0.55rem;

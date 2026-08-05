@@ -5,6 +5,7 @@ import PlantillaRestoBar from './templates/PlantillaRestoBar';
 import PlantillaEsteticaBarberia from './templates/PlantillaEsteticaBarberia';
 import PlantillaElegante from './templates/PlantillaElegante';
 import PlantillaGarage from './templates/PlantillaGarage';
+import { colorOverrideStyle } from '../../lib/plantillaColores';
 
 const PLANTILLAS = {
   generico: PlantillaGenerica,
@@ -32,5 +33,9 @@ export default function Home() {
   }, []);
 
   const Plantilla = PLANTILLAS[negocio?.plantilla] || PlantillaGenerica;
-  return <Plantilla negocio={negocio} faq={faq} error={error} />;
+  return (
+    <div style={colorOverrideStyle(negocio)}>
+      <Plantilla negocio={negocio} faq={faq} error={error} />
+    </div>
+  );
 }
