@@ -12,6 +12,7 @@ export default function NegociosList() {
   const [activandoId, setActivandoId] = useState(null);
   const [activandoClienteId, setActivandoClienteId] = useState(null);
   const [suspendiendoId, setSuspendiendoId] = useState(null);
+  const [eliminandoId, setEliminandoId] = useState(null);
   const [nuevo, setNuevo] = useState(emptyNegocio);
   const [error, setError] = useState('');
 
@@ -66,6 +67,32 @@ export default function NegociosList() {
       setError(err.message);
     } finally {
       setSuspendiendoId(null);
+    }
+  };
+
+  // Eliminacion DEFINITIVA: borra el negocio y (por ON DELETE CASCADE) toda su FAQ, links,
+  // solicitudes, pedidos, citas, reservas y usuario del panel. Irreversible. Exige escribir el
+  // nombre exacto como confirmacion — no hay manera de dispararlo por error de un solo click.
+  // No borra nada fuera de la BD: el inbox de Chatwoot y el dominio en Easypanel hay que
+  // borrarlos aparte, a mano, en esos paneles.
+  const onEliminar = async (n) => {
+    const escrito = window.prompt(
+      `Esto borra PERMANENTEMENTE a "${n.nombre}" y TODOS sus datos (FAQ, solicitudes, pedidos, citas, reservas, su usuario del panel). No se puede deshacer.\n\nEscribe exactamente el nombre del negocio para confirmar:`
+    );
+    if (escrito === null) return;
+    if (escrito !== n.nombre) {
+      window.alert('El nombre no coincide. No se eliminó nada.');
+      return;
+    }
+    setEliminandoId(n.id);
+    setError('');
+    try {
+      await api.delete(`/admin/negocios/${n.id}`, { confirmarNombre: escrito });
+      await load();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setEliminandoId(null);
     }
   };
 
@@ -128,6 +155,15 @@ export default function NegociosList() {
               </button>
             )}
             {isAgencia && <Link to={`/admin/negocios/${n.id}`}><button className="secondary">Editar bot</button></Link>}
+            {isAgencia && (
+              <button
+                className="danger"
+                onClick={() => onEliminar(n)}
+                disabled={eliminandoId === n.id}
+              >
+                {eliminandoId === n.id ? 'Eliminando…' : 'Eliminar negocio'}
+              </button>
+            )}
             <Link to={`/admin/negocios/${n.id}/faq`}><button className="secondary">FAQ</button></Link>
             <Link to={`/admin/negocios/${n.id}/solicitudes`}>
               <button className="secondary">

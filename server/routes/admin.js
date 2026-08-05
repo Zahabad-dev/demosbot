@@ -170,6 +170,24 @@ adminRouter.put('/negocios/:negocioId/suspender', requireAuth, requireAgencia, a
   res.json(rows[0]);
 });
 
+// Eliminacion DEFINITIVA de un negocio: borra la fila y, por ON DELETE CASCADE del esquema,
+// TODO lo que cuelga de el (faq, links, solicitudes, pedidos, citas, reservas, admin_users) en
+// una sola operacion irreversible. NO toca nada fuera de la base de datos — el inbox de
+// Chatwoot y el dominio dado de alta en Easypanel quedan huerfanos, hay que borrarlos a mano en
+// esos paneles si ya no se van a usar. Exige escribir el nombre exacto del negocio como
+// confirmacion (mismo patron que "escribe el nombre del repo para borrarlo" de GitHub) para que
+// no se dispare por error desde un click accidental o un script.
+adminRouter.delete('/negocios/:negocioId', requireAuth, requireAgencia, async (req, res) => {
+  const { confirmarNombre } = req.body;
+  const { rows: negRows } = await query('SELECT nombre FROM negocios WHERE id = $1', [req.params.negocioId]);
+  if (!negRows[0]) return res.status(404).json({ error: 'No encontrado' });
+  if (confirmarNombre !== negRows[0].nombre) {
+    return res.status(400).json({ error: 'El nombre de confirmación no coincide con el nombre del negocio' });
+  }
+  await query('DELETE FROM negocios WHERE id = $1', [req.params.negocioId]);
+  res.json({ ok: true });
+});
+
 // Solo rol 'agencia' puede crear negocios nuevos (nuevos clientes/demos).
 // Nace SIEMPRE inactivo (activo = false): así nunca compite por el chatwoot_inbox_id
 // con la demo que esté activa en ese momento. Se activa a propósito con /activar.
