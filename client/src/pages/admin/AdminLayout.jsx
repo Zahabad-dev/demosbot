@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../lib/apiClient';
-import { activarPush, activarNotificacionesEnPestana, notificarEnPestana } from '../../lib/pushNotifications';
+import { activarPush, activarNotificacionesEnPestana, notificarEnPestana, detectarEstadoNotificaciones } from '../../lib/pushNotifications';
 
 const POLL_MS = 30000;
 
@@ -10,8 +10,14 @@ export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [colorAccento, setColorAccento] = useState(null);
-  const [notifEstado, setNotifEstado] = useState('inactivo'); // inactivo | activando | push | pestana | no-soportado
+  const [notifEstado, setNotifEstado] = useState('cargando'); // cargando | inactivo | activando | push | pestana | denegado | no-soportado
   const pendientesPrevRef = useRef(null);
+
+  // Al entrar al panel, revisa si el navegador YA tiene el permiso concedido de una vez
+  // anterior (en vez de asumir "inactivo" y volver a pedirlo cada vez que se recarga la página).
+  useEffect(() => {
+    detectarEstadoNotificaciones().then(setNotifEstado);
+  }, []);
 
   // Camino "real" (Android, o iOS con la PWA agregada a pantalla de inicio): push del
   // navegador, avisa aunque el panel este cerrado. Si el navegador no lo soporta (típico de
@@ -79,6 +85,9 @@ export default function AdminLayout() {
         )}
         {notifEstado === 'no-soportado' && (
           <p style={{ fontSize: '0.75rem', color: '#7a8090' }}>Tu navegador no soporta notificaciones</p>
+        )}
+        {notifEstado === 'denegado' && (
+          <p style={{ fontSize: '0.75rem', color: '#7a8090' }}>Bloqueaste las notificaciones — actívalas desde el ícono de candado junto a la URL</p>
         )}
         <div style={{ marginTop: 'auto', paddingTop: '1rem', fontSize: '0.8rem', color: '#7a8090' }}>
           {user?.nombre} ({user?.rol})

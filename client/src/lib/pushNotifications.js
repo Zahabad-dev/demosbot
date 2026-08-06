@@ -59,3 +59,27 @@ export function notificarEnPestana(titulo, cuerpo) {
     new Notification(titulo, { body: cuerpo, icon: '/icon.svg' });
   }
 }
+
+// Al cargar el panel, revisa el permiso/suscripción que YA existen en el navegador, sin volver
+// a pedir permiso (requestPermission solo se llama en activarPush/activarNotificacionesEnPestana,
+// disparados por un click del usuario). Esto evita que cada recarga "olvide" que ya estaban
+// activas — el estado real vive en el navegador, no en memoria de React.
+export async function detectarEstadoNotificaciones() {
+  if (!soportaNotificaciones()) return 'no-soportado';
+  if (Notification.permission === 'denied') return 'denegado';
+  if (Notification.permission !== 'granted') return 'inactivo';
+
+  if (soportaPush()) {
+    try {
+      const reg = await navigator.serviceWorker.getRegistration();
+      const sub = await reg?.pushManager.getSubscription();
+      if (sub) return 'push';
+      // Permiso concedido pero sin suscripción viva (ej. se reinstaló el navegador) — re-suscribe sin pedir permiso otra vez.
+      const resultado = await activarPush();
+      return resultado.ok ? 'push' : 'pestana';
+    } catch {
+      return 'pestana';
+    }
+  }
+  return 'pestana';
+}
