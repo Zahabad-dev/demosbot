@@ -4,4 +4,7 @@ export const config = {
   jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-me',
   cookieSecure: process.env.COOKIE_SECURE === '1',
   nodeEnv: process.env.NODE_ENV || 'development',
+  vapidPublicKey: process.env.VAPID_PUBLIC_KEY,
+  vapidPrivateKey: process.env.VAPID_PRIVATE_KEY,
+  botPushSecret: process.env.BOT_PUSH_SECRET || 'dev-bot-push-secret-change-me',
 };

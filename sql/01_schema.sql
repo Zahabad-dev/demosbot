@@ -143,6 +143,23 @@ CREATE TABLE IF NOT EXISTS admin_users (
   creado_en      TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Suscripciones push (Web Push / PWA) para avisar "te llegó un pedido/cita/reserva nuevo" aunque
+-- el panel este cerrado (Android e iOS 16.4+ con la PWA agregada a pantalla de inicio). Un mismo
+-- admin_user puede tener varias filas (un dispositivo cada una). negocio_id es NULL para un admin
+-- de agencia (recibe avisos de todos los negocios via su admin_user_id).
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+  id             SERIAL PRIMARY KEY,
+  admin_user_id  INTEGER NOT NULL REFERENCES admin_users(id) ON DELETE CASCADE,
+  negocio_id     INTEGER REFERENCES negocios(id) ON DELETE CASCADE, -- redundante con admin_users.negocio_id, pero explicito para consultas rapidas
+  endpoint       TEXT UNIQUE NOT NULL,
+  p256dh         TEXT NOT NULL,
+  auth           TEXT NOT NULL,
+  creado_en      TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_push_subs_negocio ON push_subscriptions(negocio_id);
+CREATE INDEX IF NOT EXISTS idx_push_subs_user ON push_subscriptions(admin_user_id);
+
 CREATE INDEX IF NOT EXISTS idx_faq_negocio ON faq(negocio_id);
 CREATE INDEX IF NOT EXISTS idx_links_negocio ON links(negocio_id);
 CREATE INDEX IF NOT EXISTS idx_solicitudes_negocio ON solicitudes(negocio_id);

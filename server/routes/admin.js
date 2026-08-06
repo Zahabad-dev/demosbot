@@ -27,6 +27,31 @@ adminRouter.post('/logout', (req, res) => {
 
 adminRouter.get('/me', requireAuth, (req, res) => res.json({ user: req.auth }));
 
+// Llave pública VAPID que el frontend necesita para registrar una suscripción push del navegador.
+adminRouter.get('/push/public-key', (req, res) => res.json({ publicKey: config.vapidPublicKey || null }));
+
+// Guarda/actualiza la suscripción push del dispositivo actual (un navegador = una fila).
+// Sirve tanto para agencia como para cliente — cada quien recibe avisos de lo suyo (ver
+// notificarNegocio en push.js: agencia recibe de todos, cliente solo de su negocio).
+adminRouter.post('/push/subscribe', requireAuth, async (req, res) => {
+  const { endpoint, keys } = req.body;
+  if (!endpoint || !keys?.p256dh || !keys?.auth) return res.status(400).json({ error: 'Suscripción incompleta' });
+  await query(
+    `INSERT INTO push_subscriptions (admin_user_id, negocio_id, endpoint, p256dh, auth)
+     VALUES ($1,$2,$3,$4,$5)
+     ON CONFLICT (endpoint) DO UPDATE SET admin_user_id = $1, negocio_id = $2, p256dh = $4, auth = $5`,
+    [req.auth.sub, req.auth.negocioId, endpoint, keys.p256dh, keys.auth]
+  );
+  res.status(201).json({ ok: true });
+});
+
+adminRouter.post('/push/unsubscribe', requireAuth, async (req, res) => {
+  const { endpoint } = req.body;
+  if (!endpoint) return res.status(400).json({ error: 'Falta endpoint' });
+  await query('DELETE FROM push_subscriptions WHERE endpoint = $1 AND admin_user_id = $2', [endpoint, req.auth.sub]);
+  res.json({ ok: true });
+});
+
 // Verifica que la fila (de una tabla relacionada a negocio_id) pertenezca al negocio del
 // usuario logueado, salvo rol 'agencia' (ve todo). Usado en los PUT/DELETE de faq, links,
 // solicitudes, pedidos, citas y reservas, que se referencian por su propio id (no por

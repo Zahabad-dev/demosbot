@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { query } from '../db.js';
+import { config } from '../config.js';
+import { notificarNegocio } from '../push.js';
 
 export const publicRouter = Router();
 
@@ -86,6 +88,18 @@ publicRouter.get('/bot/negocio-por-inbox/:inboxId', async (req, res) => {
   );
   if (!rows[0]) return res.status(404).json({ error: 'Negocio no encontrado para ese inbox' });
   res.json(rows[0]);
+});
+
+// n8n llama esto justo despues de insertar un pedido/cita/reserva/solicitud nueva (inserta
+// directo a Postgres, no via API, por eso necesita este paso aparte para disparar el push).
+// Protegido con secreto compartido en vez de sesion, porque quien llama es el flujo de n8n, no
+// un usuario logueado.
+publicRouter.post('/bot/notificar', async (req, res) => {
+  if (req.headers['x-bot-secret'] !== config.botPushSecret) return res.status(401).json({ error: 'No autorizado' });
+  const { negocioId, titulo, cuerpo, url } = req.body;
+  if (!negocioId || !titulo) return res.status(400).json({ error: 'Faltan negocioId/titulo' });
+  await notificarNegocio(negocioId, { titulo, cuerpo, url });
+  res.json({ ok: true });
 });
 
 publicRouter.get('/bot/:negocioId/faq', async (req, res) => {

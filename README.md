@@ -59,7 +59,9 @@ Igual que Sianna Travel / Wolf Daniels / Black Sheep:
    correr los 3 scripts SQL vía DBGate. Puerto **cerrado** a internet — solo host interno.
 2. **App** (este repo): build Nixpacks — `cd client && npm install && npm run build && cd ../server && npm install`,
    start `cd server && npm start`. Variables: `DATABASE_URL` (host interno del Postgres),
-   `JWT_SECRET`, `COOKIE_SECURE=1`, `PORT=3001`.
+   `JWT_SECRET`, `COOKIE_SECURE=1`, `PORT=3001`. Opcionales para notificaciones push del panel
+   admin (ver sección de Notificaciones push más abajo): `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`,
+   `BOT_PUSH_SECRET`.
 3. **Chatwoot**: ya existe en tu Easypanel (el mismo que usa `BLACKBOTRESPOND`). Solo falta:
    - Crear un **inbox** para el número de WhatsApp de Tacos Memo (o de la demo que sea).
    - Copiar el `inbox_id` y el `account_id` de Chatwoot y guardarlos en el panel `/admin`
@@ -68,6 +70,23 @@ Igual que Sianna Travel / Wolf Daniels / Black Sheep:
 4. **n8n**: importar `n8n/ecosistema-faq-bot-flow.json`. Configurar credenciales de Postgres,
    Redis y OpenAI (los `REPLACE_ME` del JSON), y las variables de entorno del entorno de n8n
    `CHATWOOT_BASE_URL` y `CHATWOOT_API_TOKEN` (token de acceso de la cuenta de Chatwoot).
+
+## Notificaciones push del panel admin
+
+El panel (`/admin`) puede avisar "te llegó un pedido/cita/reserva/solicitud nuevo" vía Web Push
+(instalable como PWA en Android, y en iOS 16.4+ solo si se agrega a pantalla de inicio — Safari
+en pestaña normal de iPhone no soporta Push API, así que ahí cae a un fallback que solo avisa
+mientras el panel sigue abierto en esa pestaña).
+
+1. Generar llaves VAPID una sola vez: `npx web-push generate-vapid-keys` (o
+   `node -e "console.log(require('web-push').generateVAPIDKeys())"` desde `server/`).
+2. Configurar en el servicio del server en Easypanel: `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`,
+   y `BOT_PUSH_SECRET` (cualquier string largo aleatorio — protege el endpoint que llama n8n).
+3. **Pendiente, requiere editar el flujo real de n8n**: después de cada nodo que inserta en
+   `pedidos`/`citas`/`reservas`/`solicitudes`, agregar un nodo HTTP Request que llame
+   `POST {APP_URL}/api/public/bot/notificar` con header `x-bot-secret: {BOT_PUSH_SECRET}` y body
+   `{ negocioId, titulo, cuerpo }` — sin este paso, la infraestructura de push está lista pero
+   nunca se dispara (los inserts van directo a Postgres desde n8n, no pasan por la API).
 
 ## Pendiente / decisiones que requieren al usuario (no ejecutable desde aquí)
 
