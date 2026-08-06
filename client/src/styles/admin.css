@@ -223,3 +223,63 @@
   .faq-row-actions { justify-content: stretch; }
   .faq-row-actions button { flex: 1 1 auto; }
 }
+
+/* --- Editor de horario de citas (categoria='horario' en FaqManager) --- */
+.horario-editor {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin: 0.5rem 0;
+}
+
+.horario-dia-box {
+  background: #1e232c;
+  border: 1px solid #3a4150;
+  border-radius: 0.6rem;
+  padding: 0.75rem;
+}
+
+.horario-dia-check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.horario-dia-check input { width: auto; }
+
+.horario-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.6rem 0;
+}
+
+.horario-chip {
+  background: #262c37;
+  border: 1px solid #3a4150;
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem 0.2rem 0.7rem;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.horario-chip button {
+  background: none;
+  border: none;
+  color: #9aa1ad;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.horario-chip button:hover { color: #ff8080; }
+
+.horario-vacio { font-size: 0.8rem; color: #7a8090; }
+
+.horario-agregar { display: flex; gap: 0.4rem; }
+.horario-agregar input { flex: 1; }

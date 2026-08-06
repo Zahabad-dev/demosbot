@@ -233,18 +233,20 @@ adminRouter.get('/negocios/:negocioId/faq', requireAuth, scopeNegocio, async (re
 });
 
 // Limite de servicios/productos "estrella" por negocio — cualquier fila de FAQ que NO sea
-// categoria 'general' cuenta como catalogo (servicios, entradas, fuertes, bebidas, postres,
-// vehiculos, etc., segun la plantilla). La info general (horarios, ubicacion, financiamiento...)
-// queda sin limite. Aplica igual para agencia y cliente, es un limite de producto, no de rol.
+// categoria 'general' u 'horario' cuenta como catalogo (servicios, entradas, fuertes, bebidas,
+// postres, vehiculos, etc., segun la plantilla). La info general (ubicacion, financiamiento...)
+// y el horario configurable (una sola fila JSON) quedan sin limite. Aplica igual para agencia y
+// cliente, es un limite de producto, no de rol.
 const LIMITE_SERVICIOS_ESTRELLA = 15;
+const CATEGORIAS_SIN_LIMITE = ['general', 'horario'];
 
 adminRouter.post('/negocios/:negocioId/faq', requireAuth, scopeNegocio, async (req, res) => {
   const { categoria, pregunta, respuesta, orden, imagen_url } = req.body;
   const categoriaFinal = categoria || 'general';
-  if (categoriaFinal !== 'general') {
+  if (!CATEGORIAS_SIN_LIMITE.includes(categoriaFinal)) {
     const { rows: countRows } = await query(
-      "SELECT COUNT(*) FROM faq WHERE negocio_id = $1 AND categoria <> 'general'",
-      [req.params.negocioId]
+      "SELECT COUNT(*) FROM faq WHERE negocio_id = $1 AND categoria <> ALL($2)",
+      [req.params.negocioId, CATEGORIAS_SIN_LIMITE]
     );
     if (Number(countRows[0].count) >= LIMITE_SERVICIOS_ESTRELLA) {
       return res.status(400).json({ error: `Límite de ${LIMITE_SERVICIOS_ESTRELLA} servicios/productos estrella alcanzado. Borra alguno para agregar otro.` });

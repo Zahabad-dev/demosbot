@@ -19,6 +19,44 @@ const WHATSAPP_FALLBACK = '5217751667681';
 const DIAS = ['Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 const HORAS = ['10:00 am', '12:00 pm', '3:00 pm', '5:00 pm', '7:00 pm'];
 
+// Si el negocio configuró su propio horario (categoria='horario' en su FAQ, editado desde el
+// panel con el editor de días/horas), la agenda deja de usar los DIAS/HORAS fijos de arriba y
+// en su lugar calcula fechas reales próximas — así un slot ocupado se bloquea solo esa fecha
+// exacta, no el nombre del día entero para siempre. Si el negocio no configuró nada, sigue
+// funcionando exactamente igual que antes (compatible con las demos existentes).
+const DIAS_SEMANA_JS = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
+const DIA_LABEL_CORTO = { domingo: 'Dom', lunes: 'Lun', martes: 'Mar', miercoles: 'Mié', jueves: 'Jue', viernes: 'Vie', sabado: 'Sáb' };
+const MES_LABEL = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+function parseHorarioConfig(faq) {
+  const item = faq.find((f) => f.categoria === 'horario');
+  if (!item) return null;
+  try {
+    const obj = JSON.parse(item.respuesta || '{}');
+    const tieneAlgunDia = obj && typeof obj === 'object' && Object.values(obj).some((horas) => Array.isArray(horas) && horas.length > 0);
+    return tieneAlgunDia ? obj : null;
+  } catch {
+    return null;
+  }
+}
+
+function calcularFechasDisponibles(horarioConfig, diasAdelante = 14) {
+  const resultado = [];
+  const hoy = new Date();
+  for (let i = 1; i <= diasAdelante; i++) {
+    const fecha = new Date(hoy);
+    fecha.setDate(hoy.getDate() + i);
+    const claveDia = DIAS_SEMANA_JS[fecha.getDay()];
+    const horas = horarioConfig[claveDia];
+    if (horas && horas.length > 0) {
+      const iso = fecha.toISOString().slice(0, 10);
+      const label = `${DIA_LABEL_CORTO[claveDia]} ${fecha.getDate()} ${MES_LABEL[fecha.getMonth()]}`;
+      resultado.push({ iso, label, horas });
+    }
+  }
+  return resultado;
+}
+
 // Un solo componente de agenda sirve a todas las plantillas de tipo_funcion='citas' — lo
 // unico que cambia por plantilla es el "skin" (prefijo de clases CSS + copy de respaldo).
 // Agregar una plantilla nueva de citas = agregar una entrada aqui, no tocar la logica.
@@ -167,7 +205,8 @@ export default function AgendaInteractiva() {
   const [error, setError] = useState(false);
   const [nombreCliente, setNombreCliente] = useState('');
   const [servicioSeleccionado, setServicioSeleccionado] = useState(null);
-  const [slotSeleccionado, setSlotSeleccionado] = useState(null); // { dia, hora }
+  const [slotSeleccionado, setSlotSeleccionado] = useState(null); // { dia, hora } — dia es ISO si hay horario configurado, o el nombre del día si no
+  const [ocupados, setOcupados] = useState([]);
 
   useEffect(() => {
     Promise.all([
@@ -179,9 +218,16 @@ export default function AgendaInteractiva() {
         setFaq(f);
       })
       .catch(() => setError(true));
+    // Aparte del Promise.all de arriba: si falla, no debe tumbar toda la pagina (solo se pierde
+    // el bloqueo de slots ocupados, la agenda sigue siendo usable).
+    api.get(`/public/negocio/${slug}/citas-ocupadas`).then(setOcupados).catch(() => setOcupados([]));
   }, [slug]);
 
   if (negocio?.suspendido) return <ServicioSuspendido negocio={negocio} />;
+
+  const horarioConfig = parseHorarioConfig(faq);
+  const fechasDisponibles = horarioConfig ? calcularFechasDisponibles(horarioConfig) : null;
+  const ocupadosSet = new Set(ocupados.map((o) => `${o.fecha}|${o.horario}`));
 
   const skin = SKINS[negocio?.plantilla] || SKIN_DEFAULT;
   const { prefix: px, tagline, tituloPaso2, ctaTexto, conImagen, iconoPlaceholder, demoServicios } = skin;
@@ -249,25 +295,54 @@ export default function AgendaInteractiva() {
 
       <section className={`${px}-section`}>
         <h2>3. Elige día y horario</h2>
-        {DIAS.map((dia) => (
-          <div key={dia} style={{ marginBottom: '1rem' }}>
-            <p style={{ textAlign: 'center', fontWeight: 700, marginBottom: '0.5rem' }}>{dia}</p>
-            <div className={`${px}-agenda-grid`}>
-              {HORAS.map((hora) => {
-                const activo = slotSeleccionado?.dia === dia && slotSeleccionado?.hora === hora;
-                return (
-                  <button
-                    key={hora}
-                    className={`${px}-slot ${activo ? `${px}-slot-activo` : ''}`}
-                    onClick={() => setSlotSeleccionado({ dia, hora })}
-                  >
-                    {hora}
-                  </button>
-                );
-              })}
+        {fechasDisponibles ? (
+          fechasDisponibles.length === 0 ? (
+            <p style={{ textAlign: 'center' }}>No hay horarios disponibles próximamente — contáctanos por WhatsApp.</p>
+          ) : (
+            fechasDisponibles.map(({ iso, label, horas }) => (
+              <div key={iso} style={{ marginBottom: '1rem' }}>
+                <p style={{ textAlign: 'center', fontWeight: 700, marginBottom: '0.5rem' }}>{label}</p>
+                <div className={`${px}-agenda-grid`}>
+                  {horas.map((hora) => {
+                    const ocupado = ocupadosSet.has(`${iso}|${hora}`);
+                    const activo = slotSeleccionado?.dia === iso && slotSeleccionado?.hora === hora;
+                    return (
+                      <button
+                        key={hora}
+                        className={`${px}-slot ${activo ? `${px}-slot-activo` : ''}`}
+                        onClick={() => setSlotSeleccionado({ dia: iso, hora })}
+                        disabled={ocupado}
+                        style={ocupado ? { opacity: 0.4, textDecoration: 'line-through', cursor: 'not-allowed' } : undefined}
+                      >
+                        {ocupado ? 'Ocupado' : hora}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))
+          )
+        ) : (
+          DIAS.map((dia) => (
+            <div key={dia} style={{ marginBottom: '1rem' }}>
+              <p style={{ textAlign: 'center', fontWeight: 700, marginBottom: '0.5rem' }}>{dia}</p>
+              <div className={`${px}-agenda-grid`}>
+                {HORAS.map((hora) => {
+                  const activo = slotSeleccionado?.dia === dia && slotSeleccionado?.hora === hora;
+                  return (
+                    <button
+                      key={hora}
+                      className={`${px}-slot ${activo ? `${px}-slot-activo` : ''}`}
+                      onClick={() => setSlotSeleccionado({ dia, hora })}
+                    >
+                      {hora}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </section>
 
       <div className={`${px}-agenda-bar`}>

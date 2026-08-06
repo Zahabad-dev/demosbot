@@ -67,6 +67,19 @@ publicRouter.get('/negocio/:slug/faq', async (req, res) => {
   res.json(rows);
 });
 
+// Slots ya agendados de un negocio (fecha ISO + horario), para que la agenda interactiva los
+// tache/oculte como ocupados cuando el negocio tiene horario configurable (categoria='horario'
+// en su FAQ). Solo expone fecha+horario, nunca nombre/telefono del cliente que agendo.
+publicRouter.get('/negocio/:slug/citas-ocupadas', async (req, res) => {
+  const { rows } = await query(
+    `SELECT c.fecha, c.horario
+     FROM citas c JOIN negocios n ON n.id = c.negocio_id
+     WHERE n.slug = $1 AND c.estado <> 'Cancelada'`,
+    [req.params.slug]
+  );
+  res.json(rows);
+});
+
 publicRouter.get('/negocio/:slug/links', async (req, res) => {
   const { rows } = await query(
     `SELECT l.clave, l.url, l.descripcion
