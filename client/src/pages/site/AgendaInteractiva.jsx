@@ -11,6 +11,7 @@ import '../../styles/fumigacion.css';
 import '../../styles/sanitizacion.css';
 import '../../styles/seguros.css';
 import '../../styles/asistente.css';
+import '../../styles/constructora.css';
 import ServicioSuspendido from './ServicioSuspendido';
 import CargandoSitio from './CargandoSitio';
 import { colorOverrideStyle } from '../../lib/plantillaColores';
@@ -178,6 +179,19 @@ const SKINS = {
       { pregunta: 'Consulta inicial', respuesta: 'Valoración de tu caso y siguientes pasos. — $500 · 30 min' },
       { pregunta: 'Asesoría de seguimiento', respuesta: 'Para clientes con un trámite ya en curso. — $350 · 20 min' },
       { pregunta: 'Revisión de documentos', respuesta: 'Revisión de contratos u otros documentos. — $600 · 40 min' },
+    ],
+  },
+  constructora: {
+    prefix: 'co',
+    nombreDemo: 'Constructora Del Valle',
+    tagline: 'AGENDA TU VISITA DE OBRA',
+    tituloPaso2: '2. Elige el servicio',
+    ctaTexto: 'Agendar por WhatsApp',
+    conImagen: false,
+    demoServicios: [
+      { pregunta: 'Construcción de vivienda residencial', respuesta: 'Desde planos hasta llave en mano. — Cotización sin costo · 45 min' },
+      { pregunta: 'Remodelación y ampliación', respuesta: 'Ampliaciones, cocinas, baños y más. — Cotización sin costo · 30 min' },
+      { pregunta: 'Construcción comercial/industrial', respuesta: 'Locales, naves y oficinas. — Cotización sin costo · 45 min' },
     ],
   },
 };

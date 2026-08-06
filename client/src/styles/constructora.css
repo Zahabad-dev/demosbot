@@ -1,0 +1,319 @@
+/* Plantilla Constructora — estetica "plano arquitectonico": azul plano + amarillo de
+   seguridad sobre gris concreto, tipografia Barlow Condensed (industrial, premium) para
+   titulos y Barlow para texto. Franja diagonal amarilla en el hero como guino a la cinta de
+   precaucion de obra, sin verse "de construccion barata". */
+
+:root {
+  --co-blue: #16324a;
+  --co-blue-dark: #0d2033;
+  --co-amber: #f2a900;
+  --co-amber-dark: #c98a00;
+  --co-bg: #f3f4f5;
+  --co-concrete: #e8e9eb;
+  --co-ink: #1c2128;
+  --co-gray: #5b6470;
+  --co-line: #dcdfe3;
+}
+
+.co-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Barlow', 'Segoe UI', system-ui, sans-serif;
+  background: var(--co-bg);
+  color: var(--co-ink);
+}
+
+.co-page h1, .co-page h2, .co-page h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.co-hero {
+  position: relative;
+  background: var(--co-blue);
+  color: #fff;
+  text-align: center;
+  padding: 4rem 1.5rem 3.5rem;
+  overflow: hidden;
+}
+
+.co-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--co-amber) 0 28px,
+    var(--co-blue-dark) 28px 56px
+  );
+  opacity: 0.08;
+}
+
+.co-hero > * { position: relative; z-index: 1; }
+
+.co-logo {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  border-radius: 0.6rem;
+  background: #fff;
+  padding: 0.5rem;
+  margin: 0 auto 1.25rem;
+  display: block;
+}
+
+.co-badge {
+  display: inline-block;
+  background: var(--co-amber);
+  color: var(--co-blue-dark);
+  padding: 0.3rem 1rem;
+  border-radius: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  margin-bottom: 1.25rem;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.co-hero h1 { font-size: clamp(2.4rem, 7vw, 3.8rem); margin: 0.2rem 0; line-height: 1.05; }
+
+.co-tagline {
+  color: var(--co-amber);
+  font-weight: 700;
+  letter-spacing: 3px;
+  font-size: clamp(0.75rem, 2vw, 0.9rem);
+  margin: 0.6rem 0 1.25rem;
+  text-transform: uppercase;
+  font-family: 'Barlow Condensed', sans-serif;
+}
+
+.co-sub { max-width: 32rem; margin: 0 auto; color: #cbd5df; font-size: 1.02rem; }
+.co-hint { margin-top: 1rem; font-size: 0.8rem; color: #9fb0c0; }
+
+.co-hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; margin-top: 1.75rem; }
+
+.co-stats-row {
+  max-width: 60rem;
+  margin: -2rem auto 0;
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--co-line);
+  border-radius: 0.6rem;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(22, 50, 74, 0.15);
+}
+
+.co-stat {
+  background: #fff;
+  padding: 1.5rem 1rem;
+  text-align: center;
+}
+
+.co-stat-num {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 800;
+  font-size: 2.1rem;
+  color: var(--co-blue);
+  display: block;
+}
+
+.co-stat-label { font-size: 0.78rem; color: var(--co-gray); text-transform: uppercase; letter-spacing: 0.5px; }
+
+.co-qr-section {
+  padding: 3rem 1.5rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  background: var(--co-bg);
+}
+
+.co-qr-card {
+  background: #fff;
+  border-radius: 0.6rem;
+  padding: 1.5rem;
+  text-align: center;
+  max-width: 22rem;
+  border: 1px solid var(--co-line);
+}
+
+.co-qr-img { width: 100%; max-width: 200px; border-radius: 0.3rem; }
+.co-qr-caption { font-size: 0.8rem; color: var(--co-gray); margin-top: 0.9rem; }
+
+.co-qr-download {
+  display: inline-block;
+  margin-top: 0.9rem;
+  color: var(--co-blue);
+  font-weight: 700;
+  font-size: 0.85rem;
+  text-decoration: underline;
+}
+
+.co-cta {
+  display: inline-block;
+  background: var(--co-amber);
+  color: var(--co-blue-dark);
+  font-weight: 800;
+  padding: 0.85rem 2rem;
+  border-radius: 0.3rem;
+  border: none;
+  text-decoration: none;
+  cursor: pointer;
+  font-family: 'Barlow Condensed', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 1rem;
+}
+
+.co-cta:hover { background: var(--co-amber-dark); }
+.co-cta.co-cta-outline { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.5); }
+.co-cta.co-cta-outline:hover { background: rgba(255, 255, 255, 0.12); }
+
+.co-cards-row {
+  max-width: 74rem;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  padding: 2.5rem 1.5rem;
+}
+
+.co-mini-card {
+  border: 1px solid var(--co-line);
+  border-top: 3px solid var(--co-amber);
+  border-radius: 0.4rem;
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  background: #fff;
+}
+
+.co-mini-card h3 { font-size: 1.1rem; margin: 0 0 0.6rem; color: var(--co-blue); }
+.co-mini-card a { color: var(--co-blue); font-size: 0.85rem; text-decoration: underline; font-weight: 600; font-family: 'Barlow', sans-serif; text-transform: none; }
+
+.co-section { padding: 2.5rem 1.5rem; max-width: 74rem; margin: 0 auto; width: 100%; }
+.co-section h2 { text-align: center; margin-bottom: 1.75rem; font-size: 1.7rem; color: var(--co-blue); }
+
+.co-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.1rem;
+}
+
+.co-card {
+  background: #fff;
+  border-radius: 0.4rem;
+  padding: 1.4rem;
+  border: 1px solid var(--co-line);
+  border-left: 4px solid var(--co-blue);
+  box-shadow: 0 4px 14px rgba(22, 50, 74, 0.05);
+}
+
+.co-card h3 { margin: 0 0 0.4rem; color: var(--co-blue); font-weight: 700; font-size: 1.05rem; text-transform: none; letter-spacing: normal; font-family: 'Barlow', sans-serif; }
+.co-card p { margin: 0; color: var(--co-gray); line-height: 1.45; font-size: 0.92rem; }
+
+.co-footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 2rem 1rem;
+  background: var(--co-blue-dark);
+  color: #9fb0c0;
+}
+
+.co-powered { opacity: 0.7; font-size: 0.8rem; margin-top: 0.25rem; }
+
+/* --- Agenda interactiva (/agenda/:slug) --- */
+
+.co-hero-compact { padding: 2.25rem 1.5rem 1.75rem; }
+
+.co-field-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--co-ink);
+  margin: 0 auto 0.6rem;
+  max-width: 30rem;
+  text-align: left;
+  text-transform: none;
+  font-family: 'Barlow', sans-serif;
+}
+
+.co-input {
+  display: block;
+  width: 100%;
+  max-width: 30rem;
+  margin: 0 auto 1.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--co-line);
+  border-radius: 0.35rem;
+  font-family: 'Barlow', sans-serif;
+  font-size: 0.95rem;
+  background: #fff;
+}
+
+.co-servicio-card {
+  background: #fff;
+  border: 1px solid var(--co-line);
+  border-radius: 0.4rem;
+  padding: 1.1rem;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  font-family: 'Barlow', sans-serif;
+}
+
+.co-servicio-card h3 { margin: 0 0 0.3rem; font-size: 1.02rem; font-weight: 700; text-transform: none; letter-spacing: normal; color: var(--co-blue); }
+.co-servicio-card p { margin: 0; font-size: 0.85rem; color: var(--co-gray); }
+
+.co-servicio-card-activa { border-color: var(--co-amber); border-width: 2px; background: rgba(242, 169, 0, 0.06); }
+
+.co-agenda-grid {
+  max-width: 34rem;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 0.6rem;
+}
+
+.co-slot {
+  background: #fff;
+  border: 1px solid var(--co-line);
+  border-radius: 0.35rem;
+  padding: 0.6rem 0.4rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: center;
+  font-family: 'Barlow', sans-serif;
+}
+
+.co-slot-activo { background: var(--co-blue); color: #fff; border-color: var(--co-blue); font-weight: 700; }
+
+.co-agenda-bar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem 1.25rem 1.75rem;
+  background: linear-gradient(180deg, rgba(243,244,245,0) 0%, var(--co-bg) 35%);
+}
+
+.co-cta:disabled { background: var(--co-line); color: var(--co-gray); cursor: not-allowed; }
+
+@media (max-width: 860px) {
+  .co-cards-row { grid-template-columns: 1fr; }
+  .co-stats-row { grid-template-columns: 1fr; margin-top: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+  .co-hero { padding: 3rem 1.25rem 3rem; }
+  .co-section { padding: 2.25rem 1.25rem; }
+  .co-cta { width: 100%; text-align: center; }
+  .co-hero-actions { flex-direction: column; }
+}

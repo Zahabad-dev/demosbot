@@ -16,6 +16,7 @@ const VARS_POR_PLANTILLA = {
   sanitizacion: { primario: '--sn-blue', acento: '--sn-cyan' },
   seguros: { primario: '--sg-navy', acento: '--sg-gold' },
   asistente: { primario: '--ap-graphite', acento: '--ap-blue' },
+  constructora: { primario: '--co-blue', acento: '--co-amber' },
 };
 
 export function colorOverrideStyle(negocio) {

@@ -13,6 +13,7 @@ import PlantillaFumigacion from './templates/PlantillaFumigacion';
 import PlantillaSanitizacion from './templates/PlantillaSanitizacion';
 import PlantillaSeguros from './templates/PlantillaSeguros';
 import PlantillaAsistente from './templates/PlantillaAsistente';
+import PlantillaConstructora from './templates/PlantillaConstructora';
 import ServicioSuspendido from './ServicioSuspendido';
 import CargandoSitio from './CargandoSitio';
 import { colorOverrideStyle } from '../../lib/plantillaColores';
@@ -31,6 +32,7 @@ const PLANTILLAS = {
   sanitizacion: PlantillaSanitizacion,
   seguros: PlantillaSeguros,
   asistente: PlantillaAsistente,
+  constructora: PlantillaConstructora,
 };
 
 export default function Home() {
