@@ -22,8 +22,11 @@ const NEGOCIO_PUBLICO_COLS = 'id, slug, nombre, giro, ciudad, tono, whatsapp_num
 
 // Resuelve que negocio mostrar: primero por dominio propio (clientes reales activados con
 // su propio dominio), y si el host no coincide con ninguno (ej. el dominio compartido de
-// demos), cae al switch de siempre por `activo = true`. Asi un mismo servicio sirve tanto
-// las demos como N clientes reales, cada quien en su propio dominio, sin pisarse.
+// demos), cae al switch de siempre por `activo = true`. Ese fallback SOLO compite entre
+// demos (`es_demo = true`) — un cliente real activo sin dominio propio (ej. Black Sheep
+// Agencia usando la URL compartida mientras no le ponga dominio) nunca debe poder "robarle"
+// el lugar a la demo que se esté presentando en ese momento; se accede a el via su slug
+// directo (/agenda/:slug) en vez de la URL raiz compartida.
 export async function resolverNegocioPorHost(hostname) {
   if (hostname) {
     const { rows } = await query(
@@ -32,7 +35,7 @@ export async function resolverNegocioPorHost(hostname) {
     );
     if (rows[0]) return rows[0];
   }
-  const { rows } = await query(`SELECT ${NEGOCIO_PUBLICO_COLS} FROM negocios WHERE activo = true LIMIT 1`);
+  const { rows } = await query(`SELECT ${NEGOCIO_PUBLICO_COLS} FROM negocios WHERE activo = true AND es_demo = true LIMIT 1`);
   return rows[0] || null;
 }
 
