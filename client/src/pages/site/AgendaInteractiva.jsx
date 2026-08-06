@@ -12,6 +12,7 @@ import '../../styles/sanitizacion.css';
 import '../../styles/seguros.css';
 import '../../styles/asistente.css';
 import ServicioSuspendido from './ServicioSuspendido';
+import CargandoSitio from './CargandoSitio';
 import { colorOverrideStyle } from '../../lib/plantillaColores';
 
 const WHATSAPP_FALLBACK = '5217751667681';
@@ -223,6 +224,7 @@ export default function AgendaInteractiva() {
     api.get(`/public/negocio/${slug}/citas-ocupadas`).then(setOcupados).catch(() => setOcupados([]));
   }, [slug]);
 
+  if (!negocio && !error) return <CargandoSitio />;
   if (negocio?.suspendido) return <ServicioSuspendido negocio={negocio} />;
 
   const horarioConfig = parseHorarioConfig(faq);

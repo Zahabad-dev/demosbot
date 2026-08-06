@@ -4,6 +4,7 @@ import { api } from '../../lib/apiClient';
 import '../../styles/resto-bar.css';
 import '../../styles/flora.css';
 import ServicioSuspendido from './ServicioSuspendido';
+import CargandoSitio from './CargandoSitio';
 import { colorOverrideStyle } from '../../lib/plantillaColores';
 
 const WHATSAPP_FALLBACK = '5217751667681';
@@ -87,6 +88,7 @@ export default function MenuInteractivo() {
       .catch(() => setError(true));
   }, [slug]);
 
+  if (!negocio && !error) return <CargandoSitio />;
   if (negocio?.suspendido) return <ServicioSuspendido negocio={negocio} />;
 
   // La plantilla visual decide el "skin" (clases CSS + copy de respaldo) de este menu,

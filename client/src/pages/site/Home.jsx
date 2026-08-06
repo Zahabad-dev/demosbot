@@ -14,6 +14,7 @@ import PlantillaSanitizacion from './templates/PlantillaSanitizacion';
 import PlantillaSeguros from './templates/PlantillaSeguros';
 import PlantillaAsistente from './templates/PlantillaAsistente';
 import ServicioSuspendido from './ServicioSuspendido';
+import CargandoSitio from './CargandoSitio';
 import { colorOverrideStyle } from '../../lib/plantillaColores';
 
 const PLANTILLAS = {
@@ -49,6 +50,7 @@ export default function Home() {
       .catch(() => setError(true));
   }, []);
 
+  if (!negocio && !error) return <CargandoSitio />;
   if (negocio?.suspendido) return <ServicioSuspendido negocio={negocio} />;
 
   const Plantilla = PLANTILLAS[negocio?.plantilla] || PlantillaGenerica;
