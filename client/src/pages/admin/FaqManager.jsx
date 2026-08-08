@@ -202,7 +202,7 @@ export default function FaqManager() {
   return (
     <div>
       <h1>Preguntas frecuentes (FAQ)</h1>
-      <p style={{ color: '#9aa1ad' }}>
+      <p className="texto-tenue">
         El agente de IA solo responde con lo que está aquí. Para cambiar el negocio de giro
         (ej. de tacos a azulejos) basta con reemplazar estas filas. Las filas con categoría
         "general" u "horario" no tienen límite — los servicios/productos (cualquier otra
@@ -214,7 +214,7 @@ export default function FaqManager() {
       {radar.length > 0 && (
         <div className="radar-faq">
           <h2>Radar: preguntas que le faltan a tu FAQ</h2>
-          <p style={{ color: '#9aa1ad' }}>
+          <p className="texto-tenue">
             Estas son preguntas reales que hicieron tus clientes y que el bot no pudo resolver
             solo. Conviértelas en FAQ para que la próxima vez sí sepa responder.
           </p>
@@ -252,7 +252,7 @@ export default function FaqManager() {
               />
             </>
           )}
-          <label style={{ fontSize: '0.85rem', color: '#9aa1ad' }}>
+          <label className="texto-tenue" style={{ fontSize: '0.85rem' }}>
             <input
               type="checkbox"
               checked={item.activo}

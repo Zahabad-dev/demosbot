@@ -57,7 +57,7 @@ export default function NegocioEditor() {
   return (
     <div>
       <h1>Moldear bot: {form.nombre}</h1>
-      <p style={{ color: '#9aa1ad' }}>
+      <p className="texto-tenue">
         Este es el panel que hace al bot moldeable: cambia el giro, el tono y las instrucciones
         (system prompt) del agente de IA para convertirlo en cualquier negocio — sin tocar n8n.
       </p>
@@ -163,7 +163,7 @@ export default function NegocioEditor() {
         )}
 
         {error && <p className="error-msg">{error}</p>}
-        {saved && <p style={{ color: '#8fd18f' }}>Guardado.</p>}
+        {saved && <p style={{ color: 'var(--admin-success)' }}>Guardado.</p>}
         <button type="submit">Guardar cambios</button>
       </form>
     </div>

@@ -5,13 +5,32 @@ import { api } from '../../lib/apiClient';
 import { activarPush, activarNotificacionesEnPestana, notificarEnPestana, detectarEstadoNotificaciones } from '../../lib/pushNotifications';
 
 const POLL_MS = 30000;
+const TEMA_KEY = 'admin-tema';
+
+// Elección de tema 100% manual — nunca sigue prefers-color-scheme del sistema/navegador, se
+// guarda en localStorage para que se recuerde en este navegador entre visitas.
+function temaGuardado() {
+  try {
+    const v = localStorage.getItem(TEMA_KEY);
+    return v === 'light' || v === 'dark' ? v : 'dark';
+  } catch {
+    return 'dark';
+  }
+}
 
 export default function AdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [colorAccento, setColorAccento] = useState(null);
+  const [tema, setTema] = useState(temaGuardado);
   const [notifEstado, setNotifEstado] = useState('cargando'); // cargando | inactivo | activando | push | pestana | denegado | no-soportado
   const pendientesPrevRef = useRef(null);
+
+  const toggleTema = () => {
+    const nuevo = tema === 'dark' ? 'light' : 'dark';
+    setTema(nuevo);
+    try { localStorage.setItem(TEMA_KEY, nuevo); } catch { /* localStorage no disponible, se queda solo en memoria de esta sesión */ }
+  };
 
   // Al entrar al panel, revisa si el navegador YA tiene el permiso concedido de una vez
   // anterior (en vez de asumir "inactivo" y volver a pedirlo cada vez que se recarga la página).
@@ -66,30 +85,37 @@ export default function AdminLayout() {
   };
 
   return (
-    <div className="admin admin-shell" style={colorAccento ? { '--admin-accent': colorAccento } : undefined}>
+    <div
+      className="admin admin-shell"
+      data-theme={tema}
+      style={colorAccento ? { '--admin-accent': colorAccento } : undefined}
+    >
       <nav className="admin-nav">
         <strong style={{ color: 'var(--admin-accent, #F5C518)', marginBottom: '1rem' }}>
           {user?.rol === 'cliente' ? 'Mi Panel' : 'Ecosistema FAQ Bot'}
         </strong>
         <NavLink to="/admin" end>Negocios</NavLink>
+        <button className="secondary theme-toggle" onClick={toggleTema}>
+          {tema === 'dark' ? '☀️ Tema claro' : '🌙 Tema oscuro'}
+        </button>
         {(notifEstado === 'inactivo' || notifEstado === 'activando') && (
           <button className="secondary" onClick={onActivarNotificaciones} disabled={notifEstado === 'activando'}>
             {notifEstado === 'activando' ? 'Activando…' : 'Activar notificaciones'}
           </button>
         )}
         {notifEstado === 'push' && (
-          <p style={{ fontSize: '0.75rem', color: '#7a8090' }}>🔔 Notificaciones activas</p>
+          <p className="texto-fino" style={{ fontSize: '0.75rem' }}>🔔 Notificaciones activas</p>
         )}
         {notifEstado === 'pestana' && (
-          <p style={{ fontSize: '0.75rem', color: '#7a8090' }}>🔔 Notificaciones activas (solo con el panel abierto)</p>
+          <p className="texto-fino" style={{ fontSize: '0.75rem' }}>🔔 Notificaciones activas (solo con el panel abierto)</p>
         )}
         {notifEstado === 'no-soportado' && (
-          <p style={{ fontSize: '0.75rem', color: '#7a8090' }}>Tu navegador no soporta notificaciones</p>
+          <p className="texto-fino" style={{ fontSize: '0.75rem' }}>Tu navegador no soporta notificaciones</p>
         )}
         {notifEstado === 'denegado' && (
-          <p style={{ fontSize: '0.75rem', color: '#7a8090' }}>Bloqueaste las notificaciones — actívalas desde el ícono de candado junto a la URL</p>
+          <p className="texto-fino" style={{ fontSize: '0.75rem' }}>Bloqueaste las notificaciones — actívalas desde el ícono de candado junto a la URL</p>
         )}
-        <div style={{ marginTop: 'auto', paddingTop: '1rem', fontSize: '0.8rem', color: '#7a8090' }}>
+        <div className="texto-fino" style={{ marginTop: 'auto', paddingTop: '1rem', fontSize: '0.8rem' }}>
           {user?.nombre} ({user?.rol})
         </div>
         <button className="secondary" onClick={onLogout}>Cerrar sesión</button>

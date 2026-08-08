@@ -1,7 +1,60 @@
+/* Variables de tema — oscuro por defecto, claro cuando el panel tiene data-theme="light"
+   (elegido a mano por el usuario en AdminLayout.jsx, guardado en localStorage; nunca sigue el
+   prefers-color-scheme del sistema/navegador). El acento (--admin-accent) puede venir
+   sobreescrito inline por negocio (color de marca del cliente), independiente del tema. */
+:root {
+  --admin-bg: #14181f;
+  --admin-surface: #1e232c;
+  --admin-surface-2: #262c37;
+  --admin-surface-3: #2c3340;
+  --admin-kanban-bg: #1a1f27;
+  --admin-kanban-border: #2a3140;
+  --admin-border: #3a4150;
+  --admin-text: #e8e8ec;
+  --admin-text-strong: #ffffff;
+  --admin-text-muted: #9aa1ad;
+  --admin-text-dim: #7a8090;
+  --admin-text-faint: #5a6170;
+  --admin-nav-link: #c8ccd6;
+  --admin-accent: #F5C518;
+  --admin-accent-ink: #14181f;
+  --admin-danger: #C1272D;
+  --admin-danger-text: #ff8080;
+  --admin-success: #8fd18f;
+  --admin-overlay: rgba(0, 0, 0, 0.6);
+
+  /* Color fijo por estado de solicitud (mismo en los dos temas) — usado en el kanban. */
+  --estado-nuevo: #4f9cd6;
+  --estado-escalado: #e0893c;
+  --estado-atendido: #4caf7d;
+  --estado-cerrado: #8891a0;
+  --estado-baneado: #b23a3a;
+}
+
+[data-theme="light"] {
+  --admin-bg: #f2f3f5;
+  --admin-surface: #ffffff;
+  --admin-surface-2: #f5f6f8;
+  --admin-surface-3: #e9ebef;
+  --admin-kanban-bg: #eceef1;
+  --admin-kanban-border: #d8dce1;
+  --admin-border: #d8dce1;
+  --admin-text: #1c2128;
+  --admin-text-strong: #0d0f13;
+  --admin-text-muted: #5b6470;
+  --admin-text-dim: #6b7280;
+  --admin-text-faint: #8891a0;
+  --admin-nav-link: #3d4451;
+  --admin-accent-ink: #1c2128;
+  --admin-danger-text: #c53030;
+  --admin-success: #1f8a4c;
+  --admin-overlay: rgba(15, 18, 24, 0.45);
+}
+
 .admin {
   min-height: 100vh;
-  background: #14181f;
-  color: #e8e8ec;
+  background: var(--admin-bg);
+  color: var(--admin-text);
   font-family: system-ui, sans-serif;
 }
 
@@ -10,11 +63,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #14181f;
+  background: var(--admin-bg);
 }
 
 .admin-login form {
-  background: #1e232c;
+  background: var(--admin-surface);
   padding: 2.5rem;
   border-radius: 1rem;
   width: 100%;
@@ -24,12 +77,12 @@
   gap: 0.9rem;
 }
 
-.admin-login h1 { color: #fff; margin: 0 0 0.5rem; font-size: 1.4rem; }
+.admin-login h1 { color: var(--admin-text-strong); margin: 0 0 0.5rem; font-size: 1.4rem; }
 
 .admin input, .admin textarea, .admin select {
-  background: #262c37;
-  border: 1px solid #3a4150;
-  color: #fff;
+  background: var(--admin-surface-2);
+  border: 1px solid var(--admin-border);
+  color: var(--admin-text-strong);
   padding: 0.6rem 0.8rem;
   border-radius: 0.5rem;
   font-size: 0.95rem;
@@ -57,7 +110,7 @@
 
 .admin button {
   background: var(--admin-accent, #F5C518);
-  color: #14181f;
+  color: var(--admin-accent-ink);
   border: none;
   padding: 0.7rem 1.2rem;
   border-radius: 0.5rem;
@@ -66,27 +119,27 @@
 }
 
 .admin button.secondary { background: transparent; color: var(--admin-accent, #F5C518); border: 1px solid var(--admin-accent, #F5C518); }
-.admin button.danger { background: #C1272D; color: #fff; }
+.admin button.danger { background: var(--admin-danger); color: #fff; }
 
 .admin-shell { display: flex; min-height: 100vh; }
 .admin-nav {
   width: 220px;
-  background: #1e232c;
+  background: var(--admin-surface);
   padding: 1.5rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
-.admin-nav a { color: #c8ccd6; text-decoration: none; padding: 0.5rem 0.75rem; border-radius: 0.4rem; }
-.admin-nav a.active, .admin-nav a:hover { background: #2c3340; color: #fff; }
+.admin-nav a { color: var(--admin-nav-link); text-decoration: none; padding: 0.5rem 0.75rem; border-radius: 0.4rem; }
+.admin-nav a.active, .admin-nav a:hover { background: var(--admin-surface-3); color: var(--admin-text-strong); }
 .admin-content { flex: 1; padding: 2rem 2.5rem; max-width: 60rem; }
 
 .admin-content h1 { margin-top: 0; }
 .field { margin-bottom: 1.1rem; display: flex; flex-direction: column; gap: 0.3rem; }
-.field label { font-size: 0.85rem; color: #9aa1ad; }
+.field label { font-size: 0.85rem; color: var(--admin-text-muted); }
 
 .faq-row {
-  background: #1e232c;
+  background: var(--admin-surface);
   border-radius: 0.7rem;
   padding: 1rem;
   margin-bottom: 0.75rem;
@@ -101,8 +154,8 @@
   width: 90px;
   height: 90px;
   object-fit: contain;
-  background: #262c37;
-  border: 1px solid #3a4150;
+  background: var(--admin-surface-2);
+  border: 1px solid var(--admin-border);
   border-radius: 0.5rem;
   padding: 0.4rem;
   margin-bottom: 0.5rem;
@@ -111,8 +164,8 @@
 .badge-baneado {
   display: inline-block;
   background: rgba(255, 128, 128, 0.15);
-  color: #ff8080;
-  border: 1px solid #ff8080;
+  color: var(--admin-danger-text);
+  border: 1px solid var(--admin-danger-text);
   font-size: 0.7rem;
   font-weight: 700;
   padding: 0.15rem 0.55rem;
@@ -127,7 +180,7 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: var(--admin-overlay);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -136,7 +189,7 @@
 }
 
 .modal-box {
-  background: #1e232c;
+  background: var(--admin-surface);
   border-radius: 0.9rem;
   padding: 1.5rem;
   max-width: 30rem;
@@ -150,8 +203,8 @@
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
-  background: #2c3340;
-  color: #fff;
+  background: var(--admin-surface-3);
+  color: var(--admin-text-strong);
   border: none;
   width: 2rem;
   height: 2rem;
@@ -163,8 +216,8 @@
 .badge-activo {
   display: inline-block;
   background: rgba(143, 209, 143, 0.15);
-  color: #8fd18f;
-  border: 1px solid #8fd18f;
+  color: var(--admin-success);
+  border: 1px solid var(--admin-success);
   font-size: 0.7rem;
   font-weight: 700;
   padding: 0.15rem 0.55rem;
@@ -183,7 +236,7 @@
   height: 1.2rem;
   padding: 0 0.3rem;
   background: var(--admin-accent, #F5C518);
-  color: #1e232c;
+  color: var(--admin-accent-ink);
   font-size: 0.7rem;
   font-weight: 800;
   border-radius: 999px;
@@ -202,7 +255,22 @@
   margin-left: 0.5rem;
   vertical-align: middle;
 }
-.error-msg { color: #ff8080; font-size: 0.9rem; }
+.error-msg { color: var(--admin-danger-text); font-size: 0.9rem; }
+.texto-tenue { color: var(--admin-text-muted); }
+.texto-fino { color: var(--admin-text-dim); }
+
+/* Botón de tema claro/oscuro (AdminLayout.jsx) */
+.theme-toggle {
+  background: transparent !important;
+  color: var(--admin-text-muted) !important;
+  border: 1px solid var(--admin-border) !important;
+  font-weight: 500 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+.theme-toggle:hover { color: var(--admin-text-strong) !important; border-color: var(--admin-text-muted) !important; }
 
 @media (max-width: 768px) {
   .admin-shell { flex-direction: column; }
@@ -233,8 +301,8 @@
 }
 
 .horario-dia-box {
-  background: #1e232c;
-  border: 1px solid #3a4150;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
   border-radius: 0.6rem;
   padding: 0.75rem;
 }
@@ -244,7 +312,7 @@
   align-items: center;
   gap: 0.5rem;
   font-weight: 600;
-  color: #fff;
+  color: var(--admin-text-strong);
 }
 
 .horario-dia-check input { width: auto; }
@@ -257,8 +325,8 @@
 }
 
 .horario-chip {
-  background: #262c37;
-  border: 1px solid #3a4150;
+  background: var(--admin-surface-2);
+  border: 1px solid var(--admin-border);
   border-radius: 999px;
   padding: 0.2rem 0.5rem 0.2rem 0.7rem;
   font-size: 0.8rem;
@@ -270,16 +338,16 @@
 .horario-chip button {
   background: none;
   border: none;
-  color: #9aa1ad;
+  color: var(--admin-text-muted);
   cursor: pointer;
   padding: 0;
   font-size: 0.9rem;
   line-height: 1;
 }
 
-.horario-chip button:hover { color: #ff8080; }
+.horario-chip button:hover { color: var(--admin-danger-text); }
 
-.horario-vacio { font-size: 0.8rem; color: #7a8090; }
+.horario-vacio { font-size: 0.8rem; color: var(--admin-text-dim); }
 
 .horario-agregar { display: flex; gap: 0.4rem; }
 .horario-agregar input { flex: 1; }
@@ -294,8 +362,9 @@
 
 .kanban-column {
   flex: 0 0 260px;
-  background: #1a1f27;
-  border: 1px solid #2a3140;
+  background: var(--admin-kanban-bg);
+  border: 1px solid var(--admin-kanban-border);
+  border-top: 3px solid var(--admin-kanban-border);
   border-radius: 0.6rem;
   padding: 0.75rem;
   display: flex;
@@ -303,28 +372,36 @@
   gap: 0.6rem;
 }
 
+/* Franja de color por estado, arriba de la columna — reconocer de un vistazo sin leer texto. */
+.kanban-column-nuevo { border-top-color: var(--estado-nuevo); }
+.kanban-column-escalado { border-top-color: var(--estado-escalado); }
+.kanban-column-atendido { border-top-color: var(--estado-atendido); }
+.kanban-column-cerrado { border-top-color: var(--estado-cerrado); }
+.kanban-column-baneado { border-top-color: var(--estado-baneado); }
+
 .kanban-column h3 {
   margin: 0 0 0.25rem;
   font-size: 0.85rem;
-  color: #cbd2dc;
+  color: var(--admin-text);
   display: flex;
   align-items: center;
   gap: 0.4rem;
 }
 
 .kanban-count {
-  background: #2a3140;
-  color: #9aa1ad;
+  background: var(--admin-surface-3);
+  color: var(--admin-text-muted);
   font-size: 0.7rem;
   padding: 0.1rem 0.5rem;
   border-radius: 999px;
 }
 
-.kanban-vacio { font-size: 0.78rem; color: #5a6170; text-align: center; padding: 0.5rem 0; }
+.kanban-vacio { font-size: 0.78rem; color: var(--admin-text-faint); text-align: center; padding: 0.5rem 0; }
 
 .kanban-card {
-  background: #1e232c;
-  border: 1px solid #3a4150;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-left: 4px solid var(--admin-border);
   border-radius: 0.5rem;
   padding: 0.75rem;
   cursor: pointer;
@@ -332,6 +409,13 @@
 }
 
 .kanban-card:hover { border-color: var(--admin-accent, #F5C518); }
+
+/* Misma franja de color por estado, ahora en cada tarjeta individual. */
+.kanban-card-nuevo { border-left-color: var(--estado-nuevo); }
+.kanban-card-escalado { border-left-color: var(--estado-escalado); }
+.kanban-card-atendido { border-left-color: var(--estado-atendido); }
+.kanban-card-cerrado { border-left-color: var(--estado-cerrado); }
+.kanban-card-baneado { border-left-color: var(--estado-baneado); }
 
 .kanban-card-top {
   display: flex;
@@ -341,11 +425,11 @@
   margin-bottom: 0.4rem;
 }
 
-.kanban-card-top strong { font-size: 0.9rem; color: #fff; }
+.kanban-card-top strong { font-size: 0.9rem; color: var(--admin-text-strong); }
 
 .kanban-card-mensaje {
   font-size: 0.8rem;
-  color: #9aa1ad;
+  color: var(--admin-text-muted);
   margin: 0 0 0.5rem;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -368,8 +452,8 @@
 
 /* --- Radar de FAQ (FaqManager.jsx) --- */
 .radar-faq {
-  background: #1a1f27;
-  border: 1px solid #2a3140;
+  background: var(--admin-kanban-bg);
+  border: 1px solid var(--admin-kanban-border);
   border-radius: 0.6rem;
   padding: 1rem 1.25rem;
   margin-bottom: 1.5rem;
@@ -378,9 +462,9 @@
 .radar-faq h2 { margin-top: 0; font-size: 1.1rem; }
 
 .radar-faq-row {
-  background: #1e232c;
-  border: 1px solid #3a4150;
-  border-left: 3px solid #F5C518;
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-left: 3px solid var(--admin-accent, #F5C518);
   border-radius: 0.5rem;
   padding: 0.85rem 1rem;
   margin-bottom: 0.6rem;
@@ -395,12 +479,12 @@
   padding: 0.15rem 0.55rem;
   border-radius: 999px;
   background: rgba(245, 197, 24, 0.15);
-  color: #F5C518;
+  color: var(--admin-accent, #F5C518);
   border: 1px solid rgba(245, 197, 24, 0.4);
 }
 
 .radar-faq-motivo-intencion_compra { background: rgba(94, 204, 133, 0.15); color: #5ecc85; border-color: rgba(94, 204, 133, 0.4); }
 .radar-faq-motivo-quiere_asesor { background: rgba(94, 156, 204, 0.15); color: #5e9ccc; border-color: rgba(94, 156, 204, 0.4); }
-.radar-faq-motivo-cansado_bot { background: rgba(255, 128, 128, 0.15); color: #ff8080; border-color: rgba(255, 128, 128, 0.4); }
+.radar-faq-motivo-cansado_bot { background: rgba(255, 128, 128, 0.15); color: var(--admin-danger-text); border-color: rgba(255, 128, 128, 0.4); }
 
-.radar-faq-fecha { font-size: 0.75rem; color: #7a8090; }
+.radar-faq-fecha { font-size: 0.75rem; color: var(--admin-text-dim); }

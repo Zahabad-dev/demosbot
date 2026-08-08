@@ -111,7 +111,7 @@ export default function NegociosList() {
   return (
     <div>
       <h1>Negocios</h1>
-      <p style={{ color: '#9aa1ad' }}>
+      <p className="texto-tenue">
         Cada fila es un negocio moldeado sobre el mismo bot: cambia giro, tono, system prompt y FAQ
         sin tocar código. Entre las <strong>demos</strong> solo una puede estar activa a la vez
         (para presentar prospectos sin pisar otra demo). Un negocio marcado como <strong>Cliente</strong>
@@ -125,7 +125,7 @@ export default function NegociosList() {
             {!n.es_demo && <span className="badge-atencion">Cliente{n.dominio ? ` · ${n.dominio}` : ''}</span>}
             {n.suspendido && <span className="badge-atencion" style={{ background: '#7a2e2e' }}>Suspendido</span>}
           </strong>
-          <span style={{ color: '#9aa1ad' }}>{n.giro} · {n.ciudad}</span>
+          <span className="texto-tenue">{n.giro} · {n.ciudad}</span>
           <div className="faq-row-actions">
             {isAgencia && n.es_demo && !n.activo && (
               <button

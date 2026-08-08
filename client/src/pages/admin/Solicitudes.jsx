@@ -8,6 +8,10 @@ const ESTADOS_RESERVA = ['Nueva', 'Confirmada', 'Completada', 'Cancelada'];
 // Columnas del tablero, en el orden natural del ciclo de vida de una conversación.
 const ESTADOS_SOLICITUD = ['Nuevo', 'Escalado', 'Atendido', 'Cerrado', 'Baneado'];
 
+// Sufijo de clase por estado (kanban-column-nuevo, kanban-card-escalado, etc. en admin.css) —
+// permite reconocer de un vistazo qué tan urgente está cada tarjeta, sin leer texto.
+const claseEstado = (estado) => estado.toLowerCase();
+
 function PedidosModal({ solicitudId, onClose }) {
   const [pedidos, setPedidos] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -30,14 +34,14 @@ function PedidosModal({ solicitudId, onClose }) {
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
         <button className="modal-box-close" onClick={onClose}>✕</button>
         <h2>Historial de pedidos</h2>
-        {cargando && <p style={{ color: '#9aa1ad' }}>Cargando…</p>}
+        {cargando && <p className="texto-tenue">Cargando…</p>}
         {!cargando && pedidos.length === 0 && (
-          <p style={{ color: '#9aa1ad' }}>Este contacto todavía no ha hecho un pedido desde el menú interactivo.</p>
+          <p className="texto-tenue">Este contacto todavía no ha hecho un pedido desde el menú interactivo.</p>
         )}
         {pedidos.map((p) => (
           <div className="faq-row" key={p.id}>
             <strong>Pedido #{p.id} · {p.tipo_entrega === 'domicilio' ? 'A domicilio' : 'Pasar por él'}</strong>
-            <span style={{ color: '#9aa1ad' }}>{new Date(p.creado_en).toLocaleString('es-MX')}</span>
+            <span className="texto-tenue">{new Date(p.creado_en).toLocaleString('es-MX')}</span>
             <ul style={{ margin: '0.5rem 0', paddingLeft: '1.1rem' }}>
               {(Array.isArray(p.items) ? p.items : []).map((it, i) => (
                 <li key={i}>
@@ -80,17 +84,17 @@ function CitasModal({ solicitudId, onClose }) {
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
         <button className="modal-box-close" onClick={onClose}>✕</button>
         <h2>Historial de citas</h2>
-        {cargando && <p style={{ color: '#9aa1ad' }}>Cargando…</p>}
+        {cargando && <p className="texto-tenue">Cargando…</p>}
         {!cargando && citas.length === 0 && (
-          <p style={{ color: '#9aa1ad' }}>Este contacto todavía no ha agendado una cita desde la agenda interactiva.</p>
+          <p className="texto-tenue">Este contacto todavía no ha agendado una cita desde la agenda interactiva.</p>
         )}
         {citas.map((c) => (
           <div className="faq-row" key={c.id}>
             <strong>Cita #{c.id} · {c.servicio || 'Servicio sin especificar'}</strong>
-            <span style={{ color: '#9aa1ad' }}>
+            <span className="texto-tenue">
               {c.nombre_cliente || 'Sin nombre'} · {c.fecha || '—'} {c.horario || ''}
             </span>
-            <span style={{ color: '#9aa1ad', fontSize: '0.8rem' }}>Solicitada: {new Date(c.creado_en).toLocaleString('es-MX')}</span>
+            <span className="texto-tenue" style={{ fontSize: '0.8rem' }}>Solicitada: {new Date(c.creado_en).toLocaleString('es-MX')}</span>
             <div className="field">
               <label>Estatus de la cita</label>
               <select value={c.estado} onChange={(e) => cambiarEstado(c, e.target.value)}>
@@ -126,17 +130,17 @@ function ReservasModal({ solicitudId, onClose }) {
       <div className="modal-box" onClick={(e) => e.stopPropagation()}>
         <button className="modal-box-close" onClick={onClose}>✕</button>
         <h2>Historial de reservas</h2>
-        {cargando && <p style={{ color: '#9aa1ad' }}>Cargando…</p>}
+        {cargando && <p className="texto-tenue">Cargando…</p>}
         {!cargando && reservas.length === 0 && (
-          <p style={{ color: '#9aa1ad' }}>Este contacto todavía no ha reservado mesa por WhatsApp.</p>
+          <p className="texto-tenue">Este contacto todavía no ha reservado mesa por WhatsApp.</p>
         )}
         {reservas.map((r) => (
           <div className="faq-row" key={r.id}>
             <strong>Reserva #{r.id} · {r.personas || '?'} personas</strong>
-            <span style={{ color: '#9aa1ad' }}>
+            <span className="texto-tenue">
               {r.nombre_cliente || 'Sin nombre'} · {r.fecha || '—'} {r.horario || ''}
             </span>
-            <span style={{ color: '#9aa1ad', fontSize: '0.8rem' }}>Solicitada: {new Date(r.creado_en).toLocaleString('es-MX')}</span>
+            <span className="texto-tenue" style={{ fontSize: '0.8rem' }}>Solicitada: {new Date(r.creado_en).toLocaleString('es-MX')}</span>
             <div className="field">
               <label>Estatus de la reserva</label>
               <select value={r.estado} onChange={(e) => cambiarEstado(r, e.target.value)}>
@@ -156,7 +160,7 @@ function ReservasModal({ solicitudId, onClose }) {
 // arrastrar y soltar, pero con la misma sensación de tablero tipo Monday).
 function TarjetaSolicitud({ item, onAbrir, onCambiarEstado }) {
   return (
-    <div className="kanban-card" onClick={() => onAbrir(item)}>
+    <div className={`kanban-card kanban-card-${claseEstado(item.estado)}`} onClick={() => onAbrir(item)}>
       <div className="kanban-card-top">
         <strong>{item.nombre_contacto || item.telefono}</strong>
         {!item.leido && <span className="badge-atencion">Nuevo</span>}
@@ -226,7 +230,7 @@ function SolicitudDetalleModal({ item, onClose, onUpdated }) {
         <h2>
           {item.nombre_contacto || item.telefono} {estaBaneado && <span className="badge-baneado">Baneado</span>}
         </h2>
-        <p style={{ color: '#9aa1ad' }}>{item.telefono} · {item.canal} · {item.estado}</p>
+        <p className="texto-tenue">{item.telefono} · {item.canal} · {item.estado}</p>
         <p>{item.ultimo_mensaje}</p>
         {estaBaneado && item.motivo_baneo && <p className="error-msg">Motivo del baneo: {item.motivo_baneo}</p>}
 
@@ -301,19 +305,19 @@ export default function Solicitudes() {
   return (
     <div>
       <h1>Solicitudes / conversaciones</h1>
-      <p style={{ color: '#9aa1ad' }}>
+      <p className="texto-tenue">
         Arrastra el estado de cada tarjeta con el selector, o haz clic en una para ver el
         detalle completo. Banear un número apaga el bot para esa conversación de forma
         permanente — queda a decisión humana reactivarlo.
       </p>
       {items.length === 0 ? (
-        <p style={{ color: '#9aa1ad' }}>Aún no hay conversaciones registradas.</p>
+        <p className="texto-tenue">Aún no hay conversaciones registradas.</p>
       ) : (
         <div className="kanban-board">
           {ESTADOS_SOLICITUD.map((estado) => {
             const columna = items.filter((it) => it.estado === estado);
             return (
-              <div className="kanban-column" key={estado}>
+              <div className={`kanban-column kanban-column-${claseEstado(estado)}`} key={estado}>
                 <h3>{estado} <span className="kanban-count">{columna.length}</span></h3>
                 {columna.map((item) => (
                   <TarjetaSolicitud
