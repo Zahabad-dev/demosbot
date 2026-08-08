@@ -365,3 +365,42 @@
   .kanban-board { flex-direction: column; }
   .kanban-column { flex: 1 1 auto; }
 }
+
+/* --- Radar de FAQ (FaqManager.jsx) --- */
+.radar-faq {
+  background: #1a1f27;
+  border: 1px solid #2a3140;
+  border-radius: 0.6rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.radar-faq h2 { margin-top: 0; font-size: 1.1rem; }
+
+.radar-faq-row {
+  background: #1e232c;
+  border: 1px solid #3a4150;
+  border-left: 3px solid #F5C518;
+  border-radius: 0.5rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.6rem;
+}
+
+.radar-faq-row p { margin: 0.4rem 0; }
+
+.radar-faq-motivo {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(245, 197, 24, 0.15);
+  color: #F5C518;
+  border: 1px solid rgba(245, 197, 24, 0.4);
+}
+
+.radar-faq-motivo-intencion_compra { background: rgba(94, 204, 133, 0.15); color: #5ecc85; border-color: rgba(94, 204, 133, 0.4); }
+.radar-faq-motivo-quiere_asesor { background: rgba(94, 156, 204, 0.15); color: #5e9ccc; border-color: rgba(94, 156, 204, 0.4); }
+.radar-faq-motivo-cansado_bot { background: rgba(255, 128, 128, 0.15); color: #ff8080; border-color: rgba(255, 128, 128, 0.4); }
+
+.radar-faq-fecha { font-size: 0.75rem; color: #7a8090; }

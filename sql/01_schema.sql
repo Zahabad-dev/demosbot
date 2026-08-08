@@ -160,6 +160,22 @@ CREATE TABLE IF NOT EXISTS push_subscriptions (
 CREATE INDEX IF NOT EXISTS idx_push_subs_negocio ON push_subscriptions(negocio_id);
 CREATE INDEX IF NOT EXISTS idx_push_subs_user ON push_subscriptions(admin_user_id);
 
+-- Radar de huecos de FAQ: cada fila es una pregunta real que el bot no supo responder (motivo
+-- 'sin_info') o que hizo que escalara rápido a un humano (motivo = uno de los marcadores que
+-- ya usa "Detectar Escalacion" en n8n: intencion_compra | quiere_asesor | cansado_bot). El
+-- cliente lo ve en su panel de FAQ y puede convertir la pregunta directo en una fila de FAQ,
+-- o descartarla (resuelto=true) si no vale la pena agregarla.
+CREATE TABLE IF NOT EXISTS radar_faq (
+  id               SERIAL PRIMARY KEY,
+  negocio_id       INTEGER NOT NULL REFERENCES negocios(id) ON DELETE CASCADE,
+  pregunta_cliente TEXT NOT NULL,
+  motivo           VARCHAR(30) NOT NULL, -- sin_info | intencion_compra | quiere_asesor | cansado_bot
+  resuelto         BOOLEAN DEFAULT false,
+  creado_en        TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_radar_faq_negocio ON radar_faq(negocio_id);
+
 CREATE INDEX IF NOT EXISTS idx_faq_negocio ON faq(negocio_id);
 CREATE INDEX IF NOT EXISTS idx_links_negocio ON links(negocio_id);
 CREATE INDEX IF NOT EXISTS idx_solicitudes_negocio ON solicitudes(negocio_id);

@@ -118,6 +118,25 @@ publicRouter.post('/bot/notificar', async (req, res) => {
   res.json({ ok: true });
 });
 
+// Radar de huecos de FAQ: n8n llama esto cuando el bot dice "no tengo esa información"
+// (motivo='sin_info') o cuando Detectar Escalacion clasifica un motivo de escalación
+// (intencion_compra | quiere_asesor | cansado_bot). Mismo patron de secreto compartido que
+// /bot/notificar.
+const MOTIVOS_RADAR = ['sin_info', 'intencion_compra', 'quiere_asesor', 'cansado_bot'];
+
+publicRouter.post('/bot/radar', async (req, res) => {
+  if (req.headers['x-bot-secret'] !== config.botPushSecret) return res.status(401).json({ error: 'No autorizado' });
+  const { negocioId, pregunta, motivo } = req.body;
+  if (!negocioId || !pregunta || !MOTIVOS_RADAR.includes(motivo)) {
+    return res.status(400).json({ error: 'Faltan negocioId/pregunta, o motivo inválido' });
+  }
+  await query(
+    'INSERT INTO radar_faq (negocio_id, pregunta_cliente, motivo) VALUES ($1,$2,$3)',
+    [negocioId, pregunta, motivo]
+  );
+  res.status(201).json({ ok: true });
+});
+
 publicRouter.get('/bot/:negocioId/faq', async (req, res) => {
   const { rows } = await query(
     'SELECT categoria, pregunta, respuesta FROM faq WHERE negocio_id = $1 AND activo = true ORDER BY orden ASC',

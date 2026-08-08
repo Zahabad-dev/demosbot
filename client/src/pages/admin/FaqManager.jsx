@@ -41,6 +41,13 @@ const DIAS_SEMANA = [
   { key: 'domingo', label: 'Domingo' },
 ];
 
+const MOTIVO_LABEL = {
+  sin_info: 'El bot no supo responder',
+  intencion_compra: 'Mostró intención de compra',
+  quiere_asesor: 'Pidió un asesor humano',
+  cansado_bot: 'Se cansó del bot',
+};
+
 // Si el valor actual no está en la lista oficial (ej. quedó de un typo viejo o de otra
 // plantilla), lo agrega como opción aparte para que no desaparezca del selector — así el
 // usuario puede verlo y corregirlo eligiendo la categoría correcta de la lista.
@@ -132,11 +139,26 @@ export default function FaqManager() {
   const [negocio, setNegocio] = useState(null);
   const [nuevo, setNuevo] = useState(empty);
   const [error, setError] = useState('');
+  const [radar, setRadar] = useState([]);
 
   const load = () => api.get(`/admin/negocios/${negocioId}/faq`).then(setItems).catch((e) => setError(e.message));
+  const loadRadar = () => api.get(`/admin/negocios/${negocioId}/radar`).then(setRadar).catch(() => setRadar([]));
 
   useEffect(() => { load(); }, [negocioId]);
+  useEffect(() => { loadRadar(); }, [negocioId]);
   useEffect(() => { api.get(`/admin/negocios/${negocioId}`).then(setNegocio).catch(() => {}); }, [negocioId]);
+
+  // Precarga la pregunta real del radar en el formulario de abajo, para que agregarla al FAQ
+  // sea de un clic — no crea la fila sola, deja que el cliente decida la respuesta.
+  const convertirEnFaq = (fila) => {
+    setNuevo({ ...empty, categoria: 'general', pregunta: fila.pregunta_cliente });
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  };
+
+  const descartarRadar = async (id) => {
+    await api.put(`/admin/radar/${id}`, { resuelto: true });
+    loadRadar();
+  };
 
   const categoriasBase = CATEGORIAS_POR_TIPO[negocio?.tipo_funcion] || CATEGORIAS_POR_TIPO.ninguna;
   const yaTieneHorario = items.some((it) => it.categoria === 'horario');
@@ -188,6 +210,27 @@ export default function FaqManager() {
         <strong>{LIMITE_SERVICIOS_ESTRELLA}</strong> por negocio: llevas{' '}
         <strong>{totalEstrella}/{LIMITE_SERVICIOS_ESTRELLA}</strong>.
       </p>
+
+      {radar.length > 0 && (
+        <div className="radar-faq">
+          <h2>Radar: preguntas que le faltan a tu FAQ</h2>
+          <p style={{ color: '#9aa1ad' }}>
+            Estas son preguntas reales que hicieron tus clientes y que el bot no pudo resolver
+            solo. Conviértelas en FAQ para que la próxima vez sí sepa responder.
+          </p>
+          {radar.map((fila) => (
+            <div className="radar-faq-row" key={fila.id}>
+              <span className={`radar-faq-motivo radar-faq-motivo-${fila.motivo}`}>{MOTIVO_LABEL[fila.motivo] || fila.motivo}</span>
+              <p>{fila.pregunta_cliente}</p>
+              <span className="radar-faq-fecha">{new Date(fila.creado_en).toLocaleString('es-MX')}</span>
+              <div className="faq-row-actions">
+                <button className="secondary" onClick={() => convertirEnFaq(fila)}>Convertir en FAQ</button>
+                <button className="danger" onClick={() => descartarRadar(fila.id)}>Descartar</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {items.map((item) => (
         <div className="faq-row" key={item.id}>

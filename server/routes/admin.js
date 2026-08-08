@@ -283,6 +283,24 @@ adminRouter.delete('/faq/:id', requireAuth, async (req, res) => {
   res.json({ ok: true });
 });
 
+// --- Radar de FAQ: preguntas reales que el bot no supo responder o que escalaron rápido ---
+// El cliente ve esto en su panel de FAQ para saber exactamente qué le falta cubrir.
+adminRouter.get('/negocios/:negocioId/radar', requireAuth, scopeNegocio, async (req, res) => {
+  const { rows } = await query(
+    'SELECT * FROM radar_faq WHERE negocio_id = $1 AND resuelto = false ORDER BY creado_en DESC LIMIT 100',
+    [req.params.negocioId]
+  );
+  res.json(rows);
+});
+
+// Marca una fila del radar como resuelta (ya se agregó al FAQ, o se decidió ignorar) — no se
+// borra, se conserva como historial silencioso.
+adminRouter.put('/radar/:id', requireAuth, async (req, res) => {
+  if (!(await assertOwnsRow(req, res, 'radar_faq'))) return;
+  await query('UPDATE radar_faq SET resuelto = true WHERE id = $1', [req.params.id]);
+  res.json({ ok: true });
+});
+
 // --- Links (solo agencia: son datos tecnicos de integracion, no contenido de FAQ) ---
 adminRouter.get('/negocios/:negocioId/links', requireAuth, scopeNegocio, async (req, res) => {
   const { rows } = await query('SELECT * FROM links WHERE negocio_id = $1 ORDER BY id', [req.params.negocioId]);

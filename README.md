@@ -88,6 +88,33 @@ mientras el panel sigue abierto en esa pestaña).
    `{ negocioId, titulo, cuerpo }` — sin este paso, la infraestructura de push está lista pero
    nunca se dispara (los inserts van directo a Postgres desde n8n, no pasan por la API).
 
+## Radar de FAQ ("qué le falta a mi bot")
+
+El panel de FAQ (`/admin/negocios/:id/faq`) puede mostrarle al cliente preguntas reales que su
+bot no supo responder o que hicieron escalar rápido la conversación, con un botón "Convertir en
+FAQ" para llenar el hueco de un clic. La infraestructura (tabla `radar_faq`, endpoints, UI) ya
+está lista y verificada; falta conectar los disparadores en n8n.
+
+**Pendiente, requiere editar el flujo real de n8n a mano** (no vía MCP/código — reconstruir el
+workflow completo de 47 nodos desde SDK es demasiado riesgo para producción; se agregan estos
+nodos manualmente en la UI de n8n, mismo patrón que las notificaciones push arriba):
+
+1. **Motivos de escalación** (`intencion_compra` | `quiere_asesor` | `cansado_bot`): después del
+   nodo `Detectar Escalacion`, agregar un nodo HTTP Request (en paralelo, sin bloquear la
+   respuesta al cliente) que llame `POST {APP_URL}/api/public/bot/radar` con header
+   `x-bot-secret: {BOT_PUSH_SECRET}` y body:
+   ```json
+   { "negocioId": {{ $('Obtener Negocio (por inbox)').first().json.id }}, "pregunta": "{{ $('Combinar Mensajes del Buffer').first().json.mensajeCombinado }}", "motivo": "{{ $('Detectar Escalacion').first().json.motivo }}" }
+   ```
+   Usa **"Using Fields Below"** para el body (no texto JSON crudo) — un mensaje real con salto de
+   línea o comillas rompe el JSON armado a mano, ya pasó una vez con las notificaciones push.
+2. **Sin información** (`sin_info`): el bot dice "no tengo esa información" en texto libre, hoy
+   no hay ningún marcador que lo detecte. Se necesita un nodo nuevo (Code o IF) que revise si la
+   respuesta del agente contiene frases tipo "no tengo esa información" / "no cuento con ese
+   dato", y si es así, llame al mismo endpoint con `"motivo": "sin_info"`. Este paso requiere ver
+   el nombre exacto del nodo que genera la respuesta del agente en el flujo real — avisar antes
+   de tocarlo, es el paso con más superficie de riesgo de los dos.
+
 ## Pendiente / decisiones que requieren al usuario (no ejecutable desde aquí)
 
 - Confirmar en qué proyecto/servicio exacto de Easypanel vive la instancia de Chatwoot y su
