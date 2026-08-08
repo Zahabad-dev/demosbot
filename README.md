@@ -108,12 +108,17 @@ nodos manualmente en la UI de n8n, mismo patrón que las notificaciones push arr
    ```
    Usa **"Using Fields Below"** para el body (no texto JSON crudo) — un mensaje real con salto de
    línea o comillas rompe el JSON armado a mano, ya pasó una vez con las notificaciones push.
-2. **Sin información** (`sin_info`): el bot dice "no tengo esa información" en texto libre, hoy
-   no hay ningún marcador que lo detecte. Se necesita un nodo nuevo (Code o IF) que revise si la
-   respuesta del agente contiene frases tipo "no tengo esa información" / "no cuento con ese
-   dato", y si es así, llame al mismo endpoint con `"motivo": "sin_info"`. Este paso requiere ver
-   el nombre exacto del nodo que genera la respuesta del agente en el flujo real — avisar antes
-   de tocarlo, es el paso con más superficie de riesgo de los dos.
+2. **Sin información** (`sin_info`) — **descartado por ahora, decisión del usuario (2026-08-08)**:
+   se evaluó detectarlo con un IF que buscara frases tipo "no tengo esa información" en la
+   respuesta del agente (nodo `Agente Respuesta (moldeable por negocio)`, campo `output`), pero
+   un LLM varía demasiado cómo redacta "no sé" — ese heurístico dejaría pasar la mayoría de los
+   casos reales (falsos negativos), así que no vale la pena la superficie de riesgo para el
+   beneficio que da. La forma confiable sería la misma técnica que ya usa el sistema para
+   escalación: que el agente emita un marcador fijo (ej. `[SIN_INFO]`) cuando no encuentra la
+   respuesta en el FAQ — pero eso significa tocar el **prompt base compartido** del agente (la
+   instrucción que envuelve el `system_prompt` de cada negocio y es igual para todos), un cambio
+   de comportamiento central, no una rama nueva en paralelo como todo lo demás de esta sección.
+   Si se retoma en el futuro, confirmar antes de tocar ese prompt compartido.
 
 ## Pendiente / decisiones que requieren al usuario (no ejecutable desde aquí)
 
